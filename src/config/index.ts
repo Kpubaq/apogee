@@ -34,13 +34,6 @@ export interface ApogeeConfig {
     allowedChannels: string[];
   };
 
-  whatsapp: {
-    enabled: boolean;
-    sessionPath: string;
-    selfChatMode: boolean;
-    allowedNumbers: string[];
-  };
-
   api: {
     port: number;
     secretKey: string;
@@ -82,13 +75,6 @@ export const config: ApogeeConfig = {
     botToken: process.env.DISCORD_BOT_TOKEN || '',
     clientId: process.env.DISCORD_CLIENT_ID || '',
     allowedChannels: parseCsv(process.env.DISCORD_ALLOWED_CHANNELS),
-  },
-
-  whatsapp: {
-    enabled: parseBool(process.env.WHATSAPP_ENABLED, true),
-    sessionPath: path.resolve(process.env.WHATSAPP_SESSION_PATH || './.apogee/sessions/whatsapp'),
-    selfChatMode: parseBool(process.env.WHATSAPP_SELF_CHAT_MODE, true),
-    allowedNumbers: parseCsv(process.env.WHATSAPP_ALLOWED_NUMBERS),
   },
 
   api: {

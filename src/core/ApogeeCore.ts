@@ -14,7 +14,7 @@ import { TaskWatcher } from '../cdp/TaskWatcher.js';
 import { WorkspaceManager } from '../cdp/WorkspaceManager.js';
 
 export interface CommandContext {
-  channelId: 'telegram' | 'whatsapp' | 'discord' | 'cli' | 'api';
+  channelId: 'telegram' | 'discord' | 'cli' | 'api';
   userId: string;
   chatId: string;
   rawText: string;
@@ -39,7 +39,7 @@ export class ApogeeCore {
 
   constructor(cfg: ApogeeConfig = config) {
     this.config = cfg;
-    this.sessionManager = new SessionManager(cfg.telegram.allowedUsers, cfg.whatsapp.selfChatMode);
+    this.sessionManager = new SessionManager(cfg.telegram.allowedUsers);
 
     this.ideCDP = new CDPClient(cfg.cdp.host, cfg.cdp.idePort, 'AntiGravity IDE');
     this.agentCDP = new CDPClient(cfg.cdp.host, cfg.cdp.agentPort, 'AntiGravity CLI/App');

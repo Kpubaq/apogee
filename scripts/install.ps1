@@ -92,6 +92,5 @@ Write-Host '  apogee status        -> Check AntiGravity connection and ports' -F
 Write-Host '  apogee create [name] -> Create new project in AntiGravity' -ForegroundColor Yellow
 Write-Host '  apogee open [path]   -> Open existing project folder' -ForegroundColor Yellow
 Write-Host '  apogee projects      -> List all projects' -ForegroundColor Yellow
-Write-Host '  apogee qr            -> Show WhatsApp Web pairing QR' -ForegroundColor Yellow
 Write-Host '  apogee screenshot    -> Take instant screenshot of IDE' -ForegroundColor Yellow
 Write-Host ''

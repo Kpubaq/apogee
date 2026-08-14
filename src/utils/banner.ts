@@ -97,7 +97,7 @@ export function getApogeeBanner(options: BannerOptions = {}): string {
     cliPort = 9333,
     cliOnline = false,
     autoAccept = true,
-    activeChannels = ['Telegram', 'WhatsApp MD', 'Discord', 'CLI'],
+    activeChannels = ['Telegram', 'Discord', 'CLI'],
     showHud = true
   } = options;
 

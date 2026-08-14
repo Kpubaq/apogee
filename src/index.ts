@@ -10,7 +10,6 @@ import { printBanner } from './utils/banner.js';
 import { ApogeeCore } from './core/ApogeeCore.js';
 import { TelegramAdapter } from './adapters/TelegramAdapter.js';
 import { DiscordAdapter } from './adapters/DiscordAdapter.js';
-import { WhatsAppAdapter } from './adapters/WhatsAppAdapter.js';
 
 async function bootstrap() {
   printBanner();
@@ -20,12 +19,6 @@ async function bootstrap() {
 
   const telegramAdapter = new TelegramAdapter(core, config.telegram.botToken, config.telegram.allowedUsers);
   const discordAdapter = new DiscordAdapter(core, config.discord.botToken, config.discord.allowedChannels);
-  const whatsAppAdapter = new WhatsAppAdapter(
-    core,
-    config.whatsapp.sessionPath,
-    config.whatsapp.allowedNumbers,
-    config.whatsapp.selfChatMode
-  );
 
   if (config.telegram.enabled) {
     await telegramAdapter.start();
@@ -33,10 +26,6 @@ async function bootstrap() {
 
   if (config.discord.enabled) {
     await discordAdapter.start();
-  }
-
-  if (config.whatsapp.enabled) {
-    await whatsAppAdapter.start();
   }
 
   // REST API Bridge
@@ -98,7 +87,6 @@ async function bootstrap() {
     logger.info('System', 'Shutting down Apogee Mission Control...');
     await telegramAdapter.stop();
     await discordAdapter.stop();
-    await whatsAppAdapter.stop();
     core.domObserver.stop();
     core.taskWatcher.stop();
     await core.ideCDP.close();

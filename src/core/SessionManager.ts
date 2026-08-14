@@ -4,7 +4,7 @@
 
 export interface UserSession {
   userId: string;
-  channelId: 'telegram' | 'whatsapp' | 'discord' | 'cli' | 'api';
+  channelId: 'telegram' | 'discord' | 'cli' | 'api';
   chatId: string;
   activeAppTarget: 'ide' | 'agent' | 'ag2';
   lastActive: number;
@@ -13,23 +13,19 @@ export interface UserSession {
 export class SessionManager {
   private sessions: Map<string, UserSession> = new Map();
   private allowedUsers: Set<string> = new Set();
-  private selfChatMode: boolean = true;
+  private selfChatMode: boolean = false;
 
-  constructor(allowedUsersList: string[] = [], selfChatMode: boolean = true) {
+  constructor(allowedUsersList: string[] = []) {
     allowedUsersList.forEach(u => this.allowedUsers.add(u.trim().toLowerCase()));
-    this.selfChatMode = selfChatMode;
   }
 
   public isAuthorized(channel: string, userId: string): boolean {
-    if (this.selfChatMode && (userId === 'me' || userId === 'self' || userId.includes('self'))) {
-      return true;
-    }
     if (this.allowedUsers.size === 0) return true;
     return this.allowedUsers.has(userId.toLowerCase());
   }
 
   public getOrCreateSession(
-    channelId: 'telegram' | 'whatsapp' | 'discord' | 'cli' | 'api',
+    channelId: 'telegram' | 'discord' | 'cli' | 'api',
     userId: string,
     chatId: string
   ): UserSession {

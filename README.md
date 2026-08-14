@@ -26,22 +26,22 @@
 
 **Apogee** is a next-generation autonomous Mission Control suite designed for **AntiGravity 2.0**, **AntiGravity IDE**, and **AntiGravity CLI / Standalone App**.
 
-It allows developers to remotely pilot their coding agent, switch AI models, confirm actions (*Auto-Accept*), request instant IDE screenshots, and dispatch tasks from their smartphone via **Telegram**, **Unofficial WhatsApp Web (terminal QR-code)**, **Discord**, and an interactive terminal **CLI Dashboard**.
+It allows developers to remotely pilot their coding agent, switch AI models, confirm actions (*Auto-Accept*), request instant IDE screenshots, and dispatch tasks from their smartphone via **Telegram**, **Discord**, and an interactive terminal **CLI Dashboard**.
 
 ---
 
 ## ⚡ Key Features
 
 ### 📱 Omnichannel Adapters
-- 🟢 **WhatsApp Web (Unofficial QR Terminal):** Connect without paid official APIs by simply scanning the QR code in your console. Supports *Self-Chat (Note to Self / Saved Messages)* or specific whitelisted phone numbers.
 - 🔵 **Telegram Driver:** Inline keyboard buttons for model selection, instant IDE screenshots, generation progress reactions, and threads.
 - 🟣 **Discord Driver:** Rich Embed cards with real-time telemetry, channel streaming, and screenshot delivery.
-- 💻 **Interactive CLI Dashboard (`apogee`):** Rich terminal control center featuring neon ASCII branding with `ByKpubaq | Adil`.
+- 💻 **Interactive CLI Dashboard (`apogee`):** 2026 Luxury Cyberpunk terminal control center featuring neon ASCII branding with `ByKpubaq | Adil`.
 
 ### 🕹️ Full Remote Control for AntiGravity 2.0 / IDE / CLI
 - ⚡ **Auto-Accept Engine:** Automated DOM observer that clicks *Run*, *Accept*, *Allow*, *Continue*, and *Apply* buttons for seamless autonomous loops.
 - 📸 **Screen Capture (`/screenshot`):** Instant IDE viewport capture compressed and delivered directly to your chat.
 - 🤖 **Model Selector (`/model`):** Live model and Thinking Effort tier switching (*Gemini 3.7 Flash*, *Gemini 3.1 Pro*, *Claude Opus 4.6*, *Claude Sonnet 4.6*).
+- 📂 **Workspace & Project Management (`/create`, `/open`, `/projects`):** Create and scaffold new projects or switch active workspace contexts directly from chat or CLI.
 - 🔀 **Multi-Target Switcher (`/app`):** Real-time hot-switching between AntiGravity 2.0 / IDE (port `9334`) and Standalone CLI / App (port `9333`).
 
 ---
@@ -122,16 +122,13 @@ apogee status
 # Capture an instant IDE screenshot
 apogee screenshot
 
-# Display terminal WhatsApp Web pairing QR code
-apogee qr
-
 # Run 24/7 background supervisor with auto-restart
 npm run watchdog
 ```
 
 ---
 
-## 📱 Chat Commands (Telegram / WhatsApp / Discord)
+## 📱 Chat Commands (Telegram / Discord)
 
 | Command | Description |
 |---|---|
@@ -147,16 +144,6 @@ npm run watchdog
 | `/app [ide\|agent\|ag2]` | Switch active target between 2.0, IDE, and CLI |
 | `/stop` | Abort current agent generation |
 | `/shutdown` | Gracefully shut down Apogee server |
-
----
-
-## ⚠️ Disclaimer & Limitation of Liability
-
-> [!WARNING]
-> **Unofficial API & Third-Party Terms of Service Notice:**
-> - **Apogee** is an independent, open-source tool and is **NOT** affiliated, associated, authorized, endorsed by, or in any way officially connected with **Meta Platforms, Inc.**, **WhatsApp**, **Telegram FZ-LLC**, **Discord Inc.**, or **Google LLC**.
-> - The WhatsApp integration utilizes reverse-engineered / unofficial web automation protocols. Using automated tools or bots with personal or business WhatsApp accounts may violate WhatsApp's Terms of Service and can result in account limitations, temporary suspensions, or **permanent phone number bans** by Meta.
-> - **User Bears 100% Responsibility:** The author (**ByKpubaq | Adil**) and contributors bear **NO responsibility or liability** for any account bans, suspensions, data loss, or service terminations resulting from your use of this software. You use this software strictly at your own discretion and risk.
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "name": "apogee",
   "version": "2.0.0",
-  "description": "Apogee by ByKpubaq | Adil — Universal Mission Control for AntiGravity 2.0, IDE & CLI via Telegram, WhatsApp (QR-Web) & Discord",
+  "description": "Apogee by ByKpubaq | Adil — Universal Mission Control for AntiGravity 2.0, IDE & CLI via Telegram, Discord & CLI Dashboard",
   "main": "dist/src/index.js",
   "bin": {
     "apogee": "./dist/bin/apogee.js"
@@ -20,7 +20,6 @@
     "antigravity-2.0",
     "mission-control",
     "telegram-bot",
-    "whatsapp-bot",
     "discord-bot",
     "cdp",
     "cli",
@@ -29,18 +28,13 @@
   "author": "ByKpubaq | Adil",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^7.0.0-rc14",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
-    "pino": "^10.3.1",
-    "qrcode-terminal": "^0.12.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
-    "@types/qrcode-terminal": "^0.12.2",
     "@types/ws": "^8.5.14",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"

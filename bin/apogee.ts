@@ -1,9 +1,3 @@
-#!/usr/bin/env node
-/**
- * Apogee - Command Line Interface (CLI) & 2026 Cyberdeck Mission Control
- * Designed by ByKpubaq | Adil
- */
-
 import { Command } from 'commander';
 import chalk from 'chalk';
 import readline from 'readline';
@@ -11,7 +5,6 @@ import { printBanner, getApogeeBanner, renderCyberCard, padBoxLine } from '../sr
 import { logger } from '../src/utils/logger.js';
 import { CDPClient } from '../src/cdp/CDPClient.js';
 import { ScreenCapture } from '../src/cdp/ScreenCapture.js';
-import { TerminalQR } from '../src/utils/qr.js';
 
 const program = new Command();
 
@@ -113,17 +106,6 @@ program
   });
 
 // ==========================================
-// CLI COMMAND: QR PAIRING
-// ==========================================
-program
-  .command('qr')
-  .description('Generate WhatsApp Multi-Device pairing QR matrix in terminal')
-  .action(() => {
-    printBanner();
-    TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'Apogee WhatsApp MD Pairing Matrix');
-  });
-
-// ==========================================
 // CLI COMMAND: CREATE PROJECT
 // ==========================================
 program
@@ -211,7 +193,7 @@ program
 // ==========================================
 program
   .command('start')
-  .description('Start the full 24/7 background mission control daemon (Telegram, WA, Discord, CDP)')
+  .description('Start the full 24/7 background mission control daemon (Telegram, Discord, CDP)')
   .action(async () => {
     await import('../src/index.js');
   });
@@ -259,7 +241,7 @@ async function runInteractiveDashboard() {
     console.log(border('│') + padBoxLine(catHeader('🕹️', 'RAPID TELEMETRY & VIEWPORT ACTIONS', '#00F0FF'), W) + border('│'));
     console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[1]')} 📊 ${chalk.white.bold('System Status & Telemetry')}     ${chalk.hex('#64748B')('• Proactive CDP probe (9334/9333)')}`, W) + border('│'));
     console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[2]')} 📸 ${chalk.white.bold('Instant IDE Viewport Capture')}  ${chalk.hex('#64748B')('• Direct screenshot buffer encode')}`, W) + border('│'));
-    console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[7]')} 💬 ${chalk.white.bold('Send Real-Time Agent Prompt')}   ${chalk.hex('#64748B')('• Live injection into AntiGravity UI')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[3]')} 💬 ${chalk.white.bold('Send Real-Time Agent Prompt')}   ${chalk.hex('#64748B')('• Live injection into AntiGravity UI')}`, W) + border('│'));
     console.log(border('│') + ' '.repeat(W) + border('│'));
 
     // Category 2: Workspace & Projects
@@ -269,15 +251,10 @@ async function runInteractiveDashboard() {
     console.log(border('│') + padBoxLine(`   ${chalk.hex('#818CF8').bold('[6]')} 🗂️  ${chalk.white.bold('List Managed Projects')}         ${chalk.hex('#64748B')('• View project repository tree')}`, W) + border('│'));
     console.log(border('│') + ' '.repeat(W) + border('│'));
 
-    // Category 3: Omnichannel & Pairing
-    console.log(border('│') + padBoxLine(catHeader('📱', 'OMNICHANNEL & DEVICE PAIRING', '#EC4899'), W) + border('│'));
-    console.log(border('│') + padBoxLine(`   ${chalk.hex('#EC4899').bold('[3]')} 🟢 ${chalk.white.bold('WhatsApp Web Pairing (MD QR)')}    ${chalk.hex('#64748B')('• Multi-Device pairing matrix')}`, W) + border('│'));
-    console.log(border('│') + ' '.repeat(W) + border('│'));
-
-    // Category 4: Daemon & Mission Control
+    // Category 3: Daemon & Mission Control
     console.log(border('│') + padBoxLine(catHeader('⚙️', 'CORE DAEMON & SYSTEM CONTROL', '#10B981'), W) + border('│'));
-    console.log(border('│') + padBoxLine(`   ${chalk.hex('#10B981').bold('[8]')} 🚀 ${chalk.white.bold('Launch 24/7 Mission Control')}    ${chalk.hex('#64748B')('• Telegram/WhatsApp/Discord Daemon')}`, W) + border('│'));
-    console.log(border('│') + padBoxLine(`   ${chalk.hex('#F43F5E').bold('[9]')} ❌ ${chalk.white.bold('Exit Mission Control')}          ${chalk.hex('#64748B')('• Terminate interactive session')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#10B981').bold('[7]')} 🚀 ${chalk.white.bold('Launch 24/7 Mission Control')}    ${chalk.hex('#64748B')('• Telegram/Discord & CDP Bridge')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#F43F5E').bold('[8]')} ❌ ${chalk.white.bold('Exit Mission Control')}          ${chalk.hex('#64748B')('• Terminate interactive session')}`, W) + border('│'));
     console.log(border('│') + ' '.repeat(W) + border('│'));
 
     console.log(border('╰' + '─'.repeat(W) + '╯\n'));
@@ -286,7 +263,7 @@ async function runInteractiveDashboard() {
   renderDashboardMenu();
 
   const promptUser = async () => {
-    const choice = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.hex('#EC4899').bold('Select Action')} ${chalk.hex('#64748B')('[1-9 | q]')}: `);
+    const choice = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.hex('#EC4899').bold('Select Action')} ${chalk.hex('#64748B')('[1-8 | q]')}: `);
 
     switch (choice.toLowerCase()) {
       case '1': {
@@ -337,9 +314,24 @@ async function runInteractiveDashboard() {
       }
 
       case '3': {
-        console.log('');
-        TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'WhatsApp MD Pair Matrix');
-        await ask(rl, chalk.hex('#64748B')('  Press Enter to return to Dashboard...'));
+        const promptText = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.white('Enter Prompt for AntiGravity Agent:')} `);
+        if (promptText) {
+          const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+          if (await client.connect()) {
+            const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+            await watcher.sendUserPrompt(promptText);
+            console.log(renderCyberCard('PROMPT DISPATCHED', [
+              `${chalk.hex('#10B981').bold('✔ Dispatched:')} Prompt sent to AntiGravity UI context`,
+              `${chalk.hex('#38BDF8').bold('📝 Prompt:')}     "${promptText}"`
+            ], '#00F0FF'));
+            await client.close();
+          } else {
+            console.log(renderCyberCard('PROMPT FAILED', [
+              `${chalk.hex('#F43F5E').bold('✖ Error:')} AntiGravity IDE is not reachable on port 9334.`
+            ], '#F43F5E'));
+          }
+        }
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
         console.clear();
         printBanner();
         renderDashboardMenu();
@@ -418,39 +410,13 @@ async function runInteractiveDashboard() {
       }
 
       case '7': {
-        const promptText = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.white('Enter Prompt for AntiGravity Agent:')} `);
-        if (promptText) {
-          const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
-          if (await client.connect()) {
-            const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
-            await watcher.sendUserPrompt(promptText);
-            console.log(renderCyberCard('PROMPT DISPATCHED', [
-              `${chalk.hex('#10B981').bold('✔ Dispatched:')} Prompt sent to AntiGravity UI context`,
-              `${chalk.hex('#38BDF8').bold('📝 Prompt:')}     "${promptText}"`
-            ], '#00F0FF'));
-            await client.close();
-          } else {
-            console.log(renderCyberCard('PROMPT FAILED', [
-              `${chalk.hex('#F43F5E').bold('✖ Error:')} AntiGravity IDE is not reachable on port 9334.`
-            ], '#F43F5E'));
-          }
-        }
-        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
-        console.clear();
-        printBanner();
-        renderDashboardMenu();
-        await promptUser();
-        break;
-      }
-
-      case '8': {
         console.log(chalk.hex('#10B981').bold('\n  🚀 Launching Apogee 24/7 Mission Control Server...\n'));
         rl.close();
         await import('../src/index.js');
         break;
       }
 
-      case '9':
+      case '8':
       case 'q':
       case 'exit': {
         console.log(chalk.hex('#64748B')('\n  ⚡ Session terminated. Farewell, Operator.\n'));
