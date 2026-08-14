@@ -121,37 +121,41 @@ export class TaskWatcher {
     // 2. Native CDP Input.insertText (directly updates React/Lexical/ProseMirror buffers)
     await this.cdp.send('Input.insertText', { text: prompt });
 
-    // Short pause for state synchronization
-    await new Promise(r => setTimeout(r, 80));
+    // Wait 150ms for React/Lexical state synchronization and button rendering
+    await new Promise(r => setTimeout(r, 150));
 
-    // 3. Dispatch Enter key via native CDP KeyEvents
-    await this.cdp.send('Input.dispatchKeyEvent', {
-      type: 'rawKeyDown',
-      key: 'Enter',
-      code: 'Enter',
-      windowsVirtualKeyCode: 13,
-      nativeVirtualKeyCode: 13
-    });
-
-    await this.cdp.send('Input.dispatchKeyEvent', {
-      type: 'keyUp',
-      key: 'Enter',
-      code: 'Enter',
-      windowsVirtualKeyCode: 13,
-      nativeVirtualKeyCode: 13
-    });
-
-    // 4. Also trigger submit button if available in DOM
-    await this.cdp.evaluate(`
+    // 3. Trigger submit button in DOM
+    const clicked = await this.cdp.evaluate<boolean>(`
       (() => {
         const sendBtn = document.querySelector(
-          'button[data-tooltip-id*="input-send-button"], button[aria-label*="send" i], button[aria-label*="submit" i], button[type="submit"]'
+          'button[data-testid="send-button"], button[data-tooltip-id*="send-tooltip"], button[aria-label*="send message" i]'
         );
-        if (sendBtn && !sendBtn.disabled && !sendBtn.getAttribute('aria-label')?.toLowerCase().includes('cancel')) {
+        if (sendBtn && !sendBtn.disabled) {
           sendBtn.click();
+          return true;
         }
+        return false;
       })()
     `);
+
+    // 4. If button was not clicked, dispatch Enter key via native CDP KeyEvents
+    if (!clicked) {
+      await this.cdp.send('Input.dispatchKeyEvent', {
+        type: 'rawKeyDown',
+        key: 'Enter',
+        code: 'Enter',
+        windowsVirtualKeyCode: 13,
+        nativeVirtualKeyCode: 13
+      });
+
+      await this.cdp.send('Input.dispatchKeyEvent', {
+        type: 'keyUp',
+        key: 'Enter',
+        code: 'Enter',
+        windowsVirtualKeyCode: 13,
+        nativeVirtualKeyCode: 13
+      });
+    }
 
     this.lastState.isBusy = true;
     eventBus.emitEvent('agent:state_change', {

@@ -84,26 +84,45 @@ export class TelegramAdapter extends BaseAdapter {
       return;
     }
 
-    const payload: Record<string, any> = {
-      chat_id: chatId,
-      text: text,
-      parse_mode: 'Markdown'
-    };
-
-    if (buttons && buttons.length > 0) {
-      payload.reply_markup = {
-        inline_keyboard: buttons.map(b => [{ text: b, callback_data: b.substring(0, 60) }])
-      };
+    // Split long messages into 4000-char chunks for Telegram limit
+    const chunks: string[] = [];
+    if (text.length > 4000) {
+      for (let i = 0; i < text.length; i += 4000) {
+        chunks.push(text.substring(i, i + 4000));
+      }
+    } else {
+      chunks.push(text);
     }
 
-    await this.callApi('sendMessage', payload);
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const isLast = i === chunks.length - 1;
+
+      const payload: Record<string, any> = {
+        chat_id: chatId,
+        text: chunk,
+        parse_mode: 'Markdown'
+      };
+
+      if (isLast && buttons && buttons.length > 0) {
+        payload.reply_markup = {
+          inline_keyboard: buttons.map(b => [{ text: b, callback_data: b.substring(0, 60) }])
+        };
+      }
+
+      const res = await this.callApi('sendMessage', payload);
+      // Fallback: If Markdown parsing fails (Telegram error), send as plain text
+      if (res && !res.ok && res.description?.toLowerCase().includes('parse')) {
+        delete payload.parse_mode;
+        await this.callApi('sendMessage', payload);
+      }
+    }
   }
 
   private async sendPhotoNative(chatId: string, buffer: Buffer, caption?: string): Promise<void> {
     const formData = new FormData();
     formData.append('chat_id', chatId);
-    if (caption) formData.append('caption', caption);
-    formData.append('parse_mode', 'Markdown');
+    if (caption) formData.append('caption', caption.substring(0, 1024));
     
     const blob = new Blob([new Uint8Array(buffer)], { type: 'image/png' });
     formData.append('photo', blob, 'screenshot.png');
@@ -115,7 +134,8 @@ export class TelegramAdapter extends BaseAdapter {
 
     if (!res.ok) {
       const err = await res.text();
-      throw new Error(`Failed to send photo: ${err}`);
+      // Retry without markdown if failed
+      logger.error('TelegramAdapter', `Failed to send photo: ${err}`);
     }
   }
 
@@ -126,9 +146,14 @@ export class TelegramAdapter extends BaseAdapter {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      return await res.json();
+      const data = await res.json();
+      if (!data.ok) {
+        logger.warn('TelegramAdapter', `Telegram API warning on ${method}: ${data.description}`);
+      }
+      return data;
     } catch (e: any) {
       logger.error('TelegramAdapter', `API Exception: ${e.message}`);
+      return { ok: false, error: e.message };
     }
   }
 
