@@ -23,19 +23,30 @@ following conditions:
    including a direct link to the official repository (https://github.com/Kpubaq/apogee).
 
 2. NON-COMMERCIAL USE ONLY:
-   The Software and any derivative works may NOT be used for commercial purposes,
-   commercial distribution, fee-based services, paid SaaS hosting, monetization,
-   or integrated into proprietary closed products without prior explicit written
-   permission from the copyright holder (ByKpubaq | Adil).
+   The Software and any derivative works may NOT be used for Commercial Use (as
+   defined below) without prior explicit written permission from the copyright
+   holder (ByKpubaq | Adil).
 
-3. MODIFICATIONS & DERIVATIVES:
+3. DEFINITION OF COMMERCIAL USE:
+   For the purposes of this License, "Commercial Use" means any activity,
+   distribution, deployment, or integration primarily intended for or directed
+   towards commercial advantage, direct or indirect monetary compensation, paid
+   subscriptions, fee-charging SaaS/cloud hosting, advertising monetization, or
+   inclusion into proprietary closed-source products.
+
+4. MODIFICATIONS & DERIVATIVES:
    You may modify the source code for personal, educational, research, or
    non-commercial open-source use, provided that the modified software continues
    to be distributed under the terms of this License.
 
-4. NO PATENT OR TRADEMARK GRANT:
+5. NO PATENT OR TRADEMARK GRANT:
    This license does not grant any trademark, patent, or branding rights to the
    names "Apogee" or "ByKpubaq | Adil" except as required for reasonable attribution.
+
+6. GOVERNING LAW:
+   This License shall be governed by and construed in accordance with the
+   applicable laws of the copyright holder's jurisdiction and international
+   copyright treaties and conventions.
 
 ================================================================================
 DISCLAIMER OF WARRANTY
