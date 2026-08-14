@@ -1,5 +1,6 @@
 /**
- * Apogee - Task Watcher & Prompt Injection Engine
+ * Apogee - Task Watcher & Native CDP Prompt Injection Engine
+ * ByKpubaq | Adil
  */
 
 import { CDPClient } from './CDPClient.js';
@@ -42,7 +43,7 @@ export class TaskWatcher {
       } catch (err: any) {
         logger.debug('TaskWatcher', `Status check: ${err.message}`);
       }
-    }, 1200);
+    }, 1000);
 
     logger.info('TaskWatcher', 'Task Watcher background service active.');
   }
@@ -62,10 +63,14 @@ export class TaskWatcher {
     try {
       const script = `
         (() => {
-          const bubbles = Array.from(document.querySelectorAll('.agent-response, .chat-turn-model, [data-author="model"], .rendered-markdown'));
-          if (!bubbles.length) return '';
-          const latest = bubbles[bubbles.length - 1];
-          return (latest.innerText || latest.textContent || '').trim();
+          const elements = Array.from(document.querySelectorAll('.whitespace-pre-wrap, p, pre, .rendered-markdown, [data-author="model"]'));
+          if (!elements.length) return '';
+          // Get the last substantial element
+          for (let i = elements.length - 1; i >= 0; i--) {
+            const text = (elements[i].innerText || elements[i].textContent || '').trim();
+            if (text.length > 5) return text;
+          }
+          return '';
         })()
       `;
       const text = await this.cdp.evaluate<string>(script);
@@ -75,6 +80,9 @@ export class TaskWatcher {
     }
   }
 
+  /**
+   * Dispatches user prompt directly into AntiGravity via native Chromium CDP Input pipeline
+   */
   public async sendUserPrompt(prompt: string): Promise<boolean> {
     if (!this.cdp.getConnectedStatus()) {
       throw new Error('AntiGravity is not connected via CDP.');
@@ -82,42 +90,68 @@ export class TaskWatcher {
 
     logger.info('TaskWatcher', `Dispatching prompt to AntiGravity UI (${prompt.length} chars)...`);
 
-    const script = `
-      ((text) => {
-        const textarea = document.querySelector('textarea, [contenteditable="true"], .monaco-editor textarea, input[type="text"]');
-        if (!textarea) return { success: false, error: 'Chat input element not found' };
+    // 1. Focus editor and clear previous draft in DOM
+    const focusScript = `
+      (() => {
+        const editor = document.querySelector('[contenteditable="true"], textarea, input[type="text"]');
+        if (!editor) return { success: false, error: 'Editor input not found in DOM' };
 
-        if (textarea.tagName.toLowerCase() === 'textarea' || textarea.tagName.toLowerCase() === 'input') {
-          textarea.value = text;
-          textarea.dispatchEvent(new Event('input', { bubbles: true }));
-          textarea.dispatchEvent(new Event('change', { bubbles: true }));
+        editor.focus();
+
+        if (editor.tagName.toLowerCase() === 'textarea' || editor.tagName.toLowerCase() === 'input') {
+          editor.value = '';
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
         } else {
-          textarea.innerText = text;
-          textarea.dispatchEvent(new Event('input', { bubbles: true }));
+          // Select all & delete for contenteditable
+          document.execCommand('selectAll', false, null);
+          document.execCommand('delete', false, null);
+          editor.innerHTML = '<p><br></p>';
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        const sendBtn = document.querySelector('button[aria-label*="send" i], button[title*="send" i], .chat-send-button');
-        if (sendBtn && !sendBtn.disabled) {
-          sendBtn.click();
-          return { success: true, method: 'button_click' };
-        }
-
-        const enterEvent = new KeyboardEvent('keydown', {
-          bubbles: true,
-          cancelable: true,
-          key: 'Enter',
-          code: 'Enter',
-          keyCode: 13
-        });
-        textarea.dispatchEvent(enterEvent);
-        return { success: true, method: 'enter_key' };
-      })(${JSON.stringify(prompt)})
+        return { success: true };
+      })()
     `;
 
-    const result = await this.cdp.evaluate<{ success: boolean; method?: string; error?: string }>(script);
-    if (!result || !result.success) {
-      throw new Error(result?.error || 'Failed to send prompt to AntiGravity.');
+    const focusRes = await this.cdp.evaluate<{ success: boolean; error?: string }>(focusScript);
+    if (!focusRes?.success) {
+      throw new Error(focusRes?.error || 'Could not focus AntiGravity editor input.');
     }
+
+    // 2. Native CDP Input.insertText (directly updates React/Lexical/ProseMirror buffers)
+    await this.cdp.send('Input.insertText', { text: prompt });
+
+    // Short pause for state synchronization
+    await new Promise(r => setTimeout(r, 80));
+
+    // 3. Dispatch Enter key via native CDP KeyEvents
+    await this.cdp.send('Input.dispatchKeyEvent', {
+      type: 'rawKeyDown',
+      key: 'Enter',
+      code: 'Enter',
+      windowsVirtualKeyCode: 13,
+      nativeVirtualKeyCode: 13
+    });
+
+    await this.cdp.send('Input.dispatchKeyEvent', {
+      type: 'keyUp',
+      key: 'Enter',
+      code: 'Enter',
+      windowsVirtualKeyCode: 13,
+      nativeVirtualKeyCode: 13
+    });
+
+    // 4. Also trigger submit button if available in DOM
+    await this.cdp.evaluate(`
+      (() => {
+        const sendBtn = document.querySelector(
+          'button[data-tooltip-id*="input-send-button"], button[aria-label*="send" i], button[aria-label*="submit" i], button[type="submit"]'
+        );
+        if (sendBtn && !sendBtn.disabled && !sendBtn.getAttribute('aria-label')?.toLowerCase().includes('cancel')) {
+          sendBtn.click();
+        }
+      })()
+    `);
 
     this.lastState.isBusy = true;
     eventBus.emitEvent('agent:state_change', {
@@ -132,10 +166,21 @@ export class TaskWatcher {
   private async inspectChatState(): Promise<void> {
     const script = `
       (() => {
-        const isBusy = !!document.querySelector('.generating, .thinking, .typing-indicator, [data-status="busy"], button[aria-label*="stop" i]');
-        const bubbles = Array.from(document.querySelectorAll('.agent-response, .chat-turn-model, [data-author="model"], .rendered-markdown'));
-        const latestText = bubbles.length ? (bubbles[bubbles.length - 1].innerText || '') : '';
-        return { isBusy, latestText: latestText.trim() };
+        const isBusy = !!document.querySelector(
+          'button[aria-label*="cancel" i], button[aria-label*="stop" i], [data-tooltip-id*="cancel"], .animate-spin, .loading'
+        );
+        
+        const elements = Array.from(document.querySelectorAll('.whitespace-pre-wrap, p, pre, .rendered-markdown, [data-author="model"]'));
+        let latestText = '';
+        for (let i = elements.length - 1; i >= 0; i--) {
+          const t = (elements[i].innerText || elements[i].textContent || '').trim();
+          if (t.length > 10) {
+            latestText = t;
+            break;
+          }
+        }
+
+        return { isBusy, latestText };
       })()
     `;
 
@@ -145,16 +190,18 @@ export class TaskWatcher {
     const wasBusy = this.lastState.isBusy;
 
     this.lastState.isBusy = res.isBusy;
-    this.lastState.lastResponseText = res.latestText;
-    this.lastState.responseLength = res.latestText.length;
+    if (res.latestText) {
+      this.lastState.lastResponseText = res.latestText;
+      this.lastState.responseLength = res.latestText.length;
+    }
     this.lastState.lastUpdated = Date.now();
 
     if (wasBusy && !res.isBusy) {
       logger.success('TaskWatcher', 'Agent generation completed.');
       eventBus.emitEvent('agent:response', {
         channelId: 'system',
-        text: res.latestText,
-        data: { text: res.latestText },
+        text: this.lastState.lastResponseText,
+        data: { text: this.lastState.lastResponseText },
         timestamp: Date.now()
       });
       eventBus.emitEvent('agent:state_change', {
