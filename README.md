@@ -13,7 +13,7 @@
 
 🌍 **Languages:** [English](README.md) | [Русский](README.ru.md)
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
+[![License: Apogee Non-Commercial](https://img.shields.io/badge/License-Apogee_Non--Commercial-blueviolet.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 [![AntiGravity](https://img.shields.io/badge/AntiGravity-2.0%20%7C%20IDE%20%7C%20CLI-magenta.svg)]()
 [![Version](https://img.shields.io/badge/Version-2.0.0-orange.svg)]()
@@ -135,18 +135,18 @@ npm run watchdog
 
 ## 📄 License & Attribution
 
-This project is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**.
+This project is licensed under the **Apogee Non-Commercial License (Version 1.0)**.
 
-- **You are free to:** Share, copy, redistribute, remix, transform, and build upon this project.
+- **You are free to:** Share, copy, redistribute, remix, transform, and build upon this software for personal, research, and non-commercial open-source use.
 - **Under the following terms:**
-  - **Attribution:** You must give appropriate credit to **ByKpubaq | Adil** and provide a link to the original repository.
-  - **NonCommercial:** You may **not** use the material for commercial purposes, monetization, or paid products without prior explicit written permission from the author.
+  - **Attribution Required:** You must prominently retain copyright notices and give clear attribution to the original author (**ByKpubaq | Adil**) with a direct link to the [Apogee repository](https://github.com/Kpubaq/apogee).
+  - **Non-Commercial Only:** You may **not** use the software or derivative works for commercial purposes, monetization, paid SaaS services, or proprietary distribution without prior explicit written permission from the copyright holder.
 
 ---
 
 <div align="center">
 
 **Apogee Mission Control** — Designed & Developed by **ByKpubaq | Adil**  
-*Licensed under CC BY-NC 4.0*
+*Licensed under Apogee Non-Commercial License 1.0*
 
 </div>

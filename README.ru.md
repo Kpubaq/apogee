@@ -13,7 +13,7 @@
 
 🌍 **Языки:** [English](README.md) | [Русский](README.ru.md)
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
+[![License: Apogee Non-Commercial](https://img.shields.io/badge/License-Apogee_Non--Commercial-blueviolet.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 [![AntiGravity](https://img.shields.io/badge/AntiGravity-2.0%20%7C%20IDE%20%7C%20CLI-magenta.svg)]()
 [![Version](https://img.shields.io/badge/Version-2.0.0-orange.svg)]()
@@ -127,18 +127,18 @@ npm run watchdog
 
 ## 📄 Лицензия и условия использования
 
-Проект распространяется на условиях лицензии **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**:
+Проект распространяется на условиях лицензии **Apogee Non-Commercial License (Версия 1.0)**:
 
-- **Разрешено:** Свободно использовать, изучать, модифицировать и распространять код проекта.
+- **Разрешено:** Свободно использовать, изучать, модифицировать и распространять код проекта для личных, образовательных, исследовательских и некоммерческих целей.
 - **Обязательные условия:**
-  - **Указание авторства (Attribution):** Вы обязаны явно указывать оригинального автора (**ByKpubaq | Adil**) и ссылку на репозиторий проекта.
-  - **Некоммерческое использование (NonCommercial):** Запрещено любое коммерческое использование, монетизация, интеграция в платные SaaS-сервисы или продажа без предварительного письменного разрешения автора.
+  - **Указание авторства (Attribution Required):** Вы обязаны сохранять уведомления об авторских правах и явно указывать оригинального автора (**ByKpubaq | Adil**) с прямой ссылкой на репозиторий [Apogee](https://github.com/Kpubaq/apogee).
+  - **Только некоммерческое использование (Non-Commercial Only):** Запрещено любое коммерческое использование, монетизация, интеграция в платные SaaS-сервисы или продажа без предварительного письменного разрешения правообладателя.
 
 ---
 
 <div align="center">
 
 **Apogee Mission Control** — Разработано **ByKpubaq | Adil**  
-*Лицензия: CC BY-NC 4.0*
+*Лицензия: Apogee Non-Commercial License 1.0*
 
 </div>
