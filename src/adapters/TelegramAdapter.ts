@@ -1,11 +1,9 @@
-/**
- * Apogee - Telegram Adapter
- */
-
 import { BaseAdapter, SendMessageOptions } from './BaseAdapter.js';
 import { ApogeeCore } from '../core/ApogeeCore.js';
 import { logger } from '../utils/logger.js';
 import { eventBus } from '../core/EventBus.js';
+import os from 'os';
+import path from 'path';
 
 export class TelegramAdapter extends BaseAdapter {
   public readonly name = 'telegram' as const;
@@ -30,11 +28,24 @@ export class TelegramAdapter extends BaseAdapter {
 
   public async start(): Promise<void> {
     if (!this.isEnabled()) {
-      logger.info('TelegramAdapter', 'Telegram Bot Token not configured. Adapter skipped.');
+      const globalEnv = path.join(os.homedir(), '.apogee', '.env');
+      logger.warn('TelegramAdapter', `⚠️ Telegram Bot Token не настроен! Укажите TELEGRAM_BOT_TOKEN в файле: ${globalEnv}`);
       return;
     }
 
-    logger.info('TelegramAdapter', 'Starting Telegram Bot Long-Polling...');
+    logger.info('TelegramAdapter', 'Connecting to Telegram Bot API...');
+    try {
+      const me = await this.callApi('getMe', {});
+      if (me && me.ok) {
+        logger.success('TelegramAdapter', `✔ Telegram Bot @${me.result.username} («${me.result.first_name}») УСПЕШНО ЗАПУЩЕН И СЛУШАЕТ ЧАТ!`);
+      } else {
+        logger.error('TelegramAdapter', `✖ Неверный токен Telegram: ${JSON.stringify(me)}`);
+        return;
+      }
+    } catch (e: any) {
+      logger.error('TelegramAdapter', `✖ Ошибка подключения к Telegram: ${e.message}`);
+    }
+
     this.isRunning = true;
     this.pollAbort = new AbortController();
 

@@ -7,6 +7,9 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import readline from 'readline';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { printBanner, getApogeeBanner, renderCyberCard, padBoxLine } from '../src/utils/banner.js';
 import { logger } from '../src/utils/logger.js';
 import { CDPClient } from '../src/cdp/CDPClient.js';
@@ -192,6 +195,36 @@ program
 
     console.log(renderCyberCard('PROJECT REPOSITORY MATRIX', lines, '#A855F7'));
     console.log('\n');
+  });
+
+// ==========================================
+// CLI COMMAND: CONFIGURE TELEGRAM
+// ==========================================
+program
+  .command('config')
+  .description('Set Telegram Bot Token and configuration in ~/.apogee/.env')
+  .action(async () => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const globalEnv = path.join(os.homedir(), '.apogee', '.env');
+    console.log(chalk.hex('#00F0FF').bold(`\n  ⚙️  Configuring Apogee in ${globalEnv}\n`));
+
+    const token = await ask(rl, chalk.hex('#38BDF8').bold('  ❯ Enter your Telegram Bot Token (from @BotFather): '));
+    if (token) {
+      let content = '';
+      if (fs.existsSync(globalEnv)) {
+        content = fs.readFileSync(globalEnv, 'utf8');
+      }
+      if (content.includes('TELEGRAM_BOT_TOKEN=')) {
+        content = content.replace(/TELEGRAM_BOT_TOKEN=.*/, `TELEGRAM_BOT_TOKEN="${token}"`);
+      } else {
+        content += `\nTELEGRAM_ENABLED=true\nTELEGRAM_BOT_TOKEN="${token}"\n`;
+      }
+      fs.mkdirSync(path.dirname(globalEnv), { recursive: true });
+      fs.writeFileSync(globalEnv, content, 'utf8');
+      console.log(chalk.hex('#10B981').bold('\n  ✔ Telegram Bot Token successfully saved!'));
+      console.log(chalk.hex('#A855F7')('  Run "apogee start" to launch your bot.\n'));
+    }
+    rl.close();
   });
 
 // ==========================================

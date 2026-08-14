@@ -1,9 +1,19 @@
-/**
- * Apogee - Configuration Manager
- */
-
 import dotenv from 'dotenv';
 import path from 'path';
+import os from 'os';
+import fs from 'fs';
+
+// Try loading from ~/.apogee/.env first
+const globalEnvPath = path.join(os.homedir(), '.apogee', '.env');
+if (fs.existsSync(globalEnvPath)) {
+  dotenv.config({ path: globalEnvPath });
+}
+
+// Also try loading from current working directory (overrides)
+const localEnvPath = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(localEnvPath) && localEnvPath !== globalEnvPath) {
+  dotenv.config({ path: localEnvPath, override: true });
+}
 
 dotenv.config();
 
