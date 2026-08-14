@@ -36,7 +36,9 @@ if ($InstallDir -eq "$HOME\.apogee") {
         Write-Host "Updating existing installation in $InstallDir..." -ForegroundColor Gray
         Set-Location $InstallDir
         if (Get-Command git -ErrorAction SilentlyContinue) {
-            git pull --quiet
+            git fetch --all --quiet
+            git reset --hard origin/main --quiet
+            git clean -fd --quiet
         }
     } else {
         if (Get-Command git -ErrorAction SilentlyContinue) {

@@ -11,6 +11,7 @@ import { DOMObserver } from '../cdp/DOMObserver.js';
 import { ScreenCapture } from '../cdp/ScreenCapture.js';
 import { ModelSelector } from '../cdp/ModelSelector.js';
 import { TaskWatcher } from '../cdp/TaskWatcher.js';
+import { WorkspaceManager } from '../cdp/WorkspaceManager.js';
 
 export interface CommandContext {
   channelId: 'telegram' | 'whatsapp' | 'discord' | 'cli' | 'api';
@@ -34,6 +35,7 @@ export class ApogeeCore {
   public screenCapture: ScreenCapture;
   public modelSelector: ModelSelector;
   public taskWatcher: TaskWatcher;
+  public workspaceManager: WorkspaceManager;
 
   constructor(cfg: ApogeeConfig = config) {
     this.config = cfg;
@@ -49,6 +51,7 @@ export class ApogeeCore {
     this.screenCapture = new ScreenCapture(this.activeCDP);
     this.modelSelector = new ModelSelector(this.activeCDP, cfg.defaultModel);
     this.taskWatcher = new TaskWatcher(this.activeCDP);
+    this.workspaceManager = new WorkspaceManager(this.activeCDP, this.taskWatcher);
   }
 
   public async initialize(): Promise<void> {
@@ -120,11 +123,50 @@ export class ApogeeCore {
 • \`/latest\` — получить последний ответ агента
 • \`/model\` — выбор модели и уровня Thinking Effort
 • \`/autoaccept\` — включить/выключить авто-клик подтверждений
+• \`/create <имя>\` — создать новый проект в AntiGravity
+• \`/open <путь>\` — открыть существующую папку/проект
+• \`/projects\` — список проектов в папке проектов
 • \`/app [ide|agent|ag2]\` — переключить активную цель
 • \`/stop\` — остановить текущую генерацию
 • \`/shutdown\` — завершить работу сервера Apogee
 `.trim()
         };
+
+      case '/new':
+      case '/create': {
+        if (!args) {
+          return { text: '💡 Укажите имя нового проекта. Пример: `/create my_telegram_bot`' };
+        }
+        try {
+          const res = await this.workspaceManager.createProject(args.trim());
+          return { text: res.message };
+        } catch (e: any) {
+          return { text: `⚠️ Ошибка создания проекта: ${e.message}` };
+        }
+      }
+
+      case '/open':
+      case '/workspace': {
+        if (!args) {
+          return { text: '💡 Укажите путь к папке проекта. Пример: `/open C:\\Projects\\my_app`' };
+        }
+        try {
+          const res = await this.workspaceManager.openProject(args.trim());
+          return { text: res.message };
+        } catch (e: any) {
+          return { text: `⚠️ Ошибка открытия проекта: ${e.message}` };
+        }
+      }
+
+      case '/projects': {
+        const list = await this.workspaceManager.listProjects();
+        if (list.length === 0) {
+          return { text: '📂 Папка проектов пуста. Создайте новый проект через `/create <имя>`.' };
+        }
+        return {
+          text: `📂 **Список доступных проектов:**\n\n` + list.map((p, i) => `${i + 1}. \`${p}\``).join('\n')
+        };
+      }
 
       case '/status': {
         const info = this.activeCDP.getTargetInfo();

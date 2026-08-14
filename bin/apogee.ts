@@ -83,6 +83,52 @@ program
   });
 
 program
+  .command('create <name>')
+  .description('Создать новый проект в AntiGravity и открыть его')
+  .action(async (name: string) => {
+    printBanner();
+    const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+    await client.connect().catch(() => {});
+    const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+    const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+    const res = await ws.createProject(name);
+    console.log(chalk.green(`\n${res.message}\n`));
+    await client.close();
+  });
+
+program
+  .command('open <path>')
+  .description('Открыть существующую папку/проект в AntiGravity')
+  .action(async (targetPath: string) => {
+    printBanner();
+    const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+    await client.connect().catch(() => {});
+    const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+    const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+    const res = await ws.openProject(targetPath);
+    console.log(chalk.green(`\n${res.message}\n`));
+    await client.close();
+  });
+
+program
+  .command('projects')
+  .description('Показать список проектов в рабочей директории')
+  .action(async () => {
+    printBanner();
+    const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+    const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+    const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+    const list = await ws.listProjects();
+    console.log(chalk.bold.cyan('📂 Список проектов в ~/AntiGravityProjects:'));
+    if (list.length === 0) {
+      console.log(chalk.gray('   Папка пуста. Создайте проект через: apogee create <имя>'));
+    } else {
+      list.forEach((p, i) => console.log(`   ${chalk.yellow(`${i + 1}.`)} ${chalk.white(p)}`));
+    }
+    console.log('\n');
+  });
+
+program
   .command('dashboard', { isDefault: true })
   .description('Открыть интерактивный терминальный Mission Control дашборд')
   .action(async () => {
@@ -102,12 +148,15 @@ function runInteractiveDashboard() {
   ${chalk.cyan('1.')} Проверить статус подключения (Status & Ports)
   ${chalk.cyan('2.')} Сделать моментальный скриншот IDE (Screenshot)
   ${chalk.cyan('3.')} Показать QR-код WhatsApp Web (QR Pairing)
-  ${chalk.cyan('4.')} Отправить промпт агенту (Send Prompt)
-  ${chalk.cyan('5.')} Запустить полный сервис в фоне (Start Server)
-  ${chalk.cyan('6.')} Выйти (Exit)
+  ${chalk.cyan('4.')} Создать новый проект в AntiGravity (Create Project)
+  ${chalk.cyan('5.')} Открыть существующий проект (Open Project)
+  ${chalk.cyan('6.')} Список доступных проектов (List Projects)
+  ${chalk.cyan('7.')} Отправить промпт агенту (Send Prompt)
+  ${chalk.cyan('8.')} Запустить полный фоновый сервис 24/7 (Start Server)
+  ${chalk.cyan('9.')} Выйти (Exit)
 `);
 
-  rl.question(chalk.bold.magenta('Выберите действие [1-6]: '), async (answer) => {
+  rl.question(chalk.bold.magenta('Выберите действие [1-9]: '), async (answer) => {
     const choice = answer.trim();
 
     switch (choice) {
@@ -141,6 +190,47 @@ function runInteractiveDashboard() {
         break;
       }
       case '4': {
+        rl.question(chalk.cyan('Введите имя нового проекта: '), async (projName) => {
+          const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+          await client.connect().catch(() => {});
+          const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+          const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+          const res = await ws.createProject(projName);
+          console.log(chalk.green(`\n${res.message}\n`));
+          await client.close();
+          rl.close();
+        });
+        break;
+      }
+      case '5': {
+        rl.question(chalk.cyan('Введите путь к папке: '), async (folderPath) => {
+          const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+          await client.connect().catch(() => {});
+          const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+          const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+          try {
+            const res = await ws.openProject(folderPath);
+            console.log(chalk.green(`\n${res.message}\n`));
+          } catch (e: any) {
+            console.log(chalk.red(`\n✖ ${e.message}\n`));
+          }
+          await client.close();
+          rl.close();
+        });
+        break;
+      }
+      case '6': {
+        const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
+        const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
+        const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
+        const list = await ws.listProjects();
+        console.log(chalk.bold.cyan('\n📂 Доступные проекты:'));
+        list.forEach((p, i) => console.log(`   ${chalk.yellow(`${i + 1}.`)} ${chalk.white(p)}`));
+        console.log('\n');
+        rl.close();
+        break;
+      }
+      case '7': {
         rl.question(chalk.cyan('Введите сообщение для агента: '), async (promptText) => {
           const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
           if (await client.connect()) {
@@ -155,7 +245,7 @@ function runInteractiveDashboard() {
         });
         break;
       }
-      case '5': {
+      case '8': {
         rl.close();
         await import('../src/index.js');
         break;

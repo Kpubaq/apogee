@@ -27,7 +27,9 @@ else
     echo -e "\033[1;33m[1/4] Downloading Apogee from GitHub to $INSTALL_DIR...\033[0m"
     if [ -d "$INSTALL_DIR" ]; then
         cd "$INSTALL_DIR"
-        git pull --quiet || true
+        git fetch --all --quiet || true
+        git reset --hard origin/main --quiet || true
+        git clean -fd --quiet || true
     else
         git clone --quiet https://github.com/Kpubaq/apogee.git "$INSTALL_DIR"
         cd "$INSTALL_DIR"

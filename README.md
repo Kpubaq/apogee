@@ -104,8 +104,17 @@ antigravity-ide --remote-debugging-port=9334
 Once installed, the `apogee` command is available everywhere on your machine:
 
 ```bash
-# Open interactive terminal Dashboard
+# Open interactive terminal Dashboard (with menu for projects, status, screenshot)
 apogee
+
+# Create a new project in AntiGravity and open it
+apogee create my_awesome_app
+
+# Open an existing folder/project in AntiGravity
+apogee open C:\Projects\my_existing_app
+
+# List all projects in ~/AntiGravityProjects
+apogee projects
 
 # Check CDP ports and connection status
 apogee status
@@ -127,6 +136,9 @@ npm run watchdog
 | Command | Description |
 |---|---|
 | *(any text)* | Dispatch prompt directly to the AntiGravity agent |
+| `/create <name>` | Create a new project in AntiGravity and open it |
+| `/open <path>` | Open an existing workspace/folder in AntiGravity |
+| `/projects` | List available projects in the projects folder |
 | `/status` | Connection telemetry, active target port, and model status |
 | `/screenshot` | Capture and receive a screenshot of the active IDE window |
 | `/latest` | Retrieve the latest response from the agent |
