@@ -13,7 +13,7 @@
 
 🌍 **Languages:** [English](README.md) | [Русский](README.ru.md)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 [![AntiGravity](https://img.shields.io/badge/AntiGravity-2.0%20%7C%20IDE%20%7C%20CLI-magenta.svg)]()
 [![Version](https://img.shields.io/badge/Version-2.0.0-orange.svg)]()
@@ -133,9 +133,20 @@ npm run watchdog
 
 ---
 
+## 📄 License & Attribution
+
+This project is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**.
+
+- **You are free to:** Share, copy, redistribute, remix, transform, and build upon this project.
+- **Under the following terms:**
+  - **Attribution:** You must give appropriate credit to **ByKpubaq | Adil** and provide a link to the original repository.
+  - **NonCommercial:** You may **not** use the material for commercial purposes, monetization, or paid products without prior explicit written permission from the author.
+
+---
+
 <div align="center">
 
 **Apogee Mission Control** — Designed & Developed by **ByKpubaq | Adil**  
-*Open Source under MIT License*
+*Licensed under CC BY-NC 4.0*
 
 </div>

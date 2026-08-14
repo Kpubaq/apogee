@@ -27,7 +27,7 @@
     "ai-agent"
   ],
   "author": "ByKpubaq | Adil",
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
