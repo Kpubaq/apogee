@@ -46,29 +46,40 @@ It allows developers to remotely pilot their coding agent, switch AI models, con
 
 ---
 
-## 🚀 Installation & Quick Start
+## 🚀 One-Line Installation (No Manual Download Required)
 
-### 1. Global Installation (One-Command Setup)
+You do **not** need to manually clone or download the repository. Simply run one of the following commands in your terminal:
 
-#### Windows (PowerShell)
+### 🪟 Windows (PowerShell)
 ```powershell
-cd C:\Users\kpubaQ\.gemini\antigravity\scratch\apogee
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1
+irm https://raw.githubusercontent.com/Kpubaq/apogee/main/scripts/install.ps1 | iex
 ```
 
-#### Linux & macOS (Bash)
+### 🍎 macOS / 🐧 Linux (Terminal)
 ```bash
-chmod +x scripts/install.sh
-./scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/Kpubaq/apogee/main/scripts/install.sh | bash
 ```
 
-After installation, the `apogee` CLI command is registered globally on your system.
+### 📦 Via NPM (Global)
+```bash
+npm install -g github:Kpubaq/apogee
+```
+
+*(Requires [Node.js](https://nodejs.org) v18+)*
 
 ---
 
-### 2. Launch AntiGravity with Debugging Port
+### Alternative: Run Instantly via NPX (Without Installation)
 
-Launch your target environment with `--remote-debugging-port`:
+```bash
+npx github:Kpubaq/apogee
+```
+
+---
+
+## 🕹️ Launching AntiGravity with Debugging Port
+
+Launch your AntiGravity environment with the `--remote-debugging-port` flag:
 
 ```powershell
 # Windows PowerShell (AntiGravity 2.0 / IDE)
@@ -88,7 +99,9 @@ antigravity-ide --remote-debugging-port=9334
 
 ---
 
-### 3. Launching Apogee
+## 💻 CLI Commands
+
+Once installed, the `apogee` command is available everywhere on your machine:
 
 ```bash
 # Open interactive terminal Dashboard
@@ -122,14 +135,6 @@ npm run watchdog
 | `/app [ide\|agent\|ag2]` | Switch active target between 2.0, IDE, and CLI |
 | `/stop` | Abort current agent generation |
 | `/shutdown` | Gracefully shut down Apogee server |
-
----
-
-## 🛡️ Security Architecture
-
-1. **Whitelisting:** Access is strictly controlled via `TELEGRAM_ALLOWED_USERS`, `WHATSAPP_ALLOWED_NUMBERS`, and `DISCORD_ALLOWED_CHANNELS`.
-2. **Channel Isolation:** Network hiccups on WhatsApp or Telegram do not disrupt the other active channels.
-3. **Session Privacy:** WhatsApp auth credentials and secrets remain local in `sessions/` and are guarded by `.gitignore`.
 
 ---
 

@@ -46,27 +46,38 @@
 
 ---
 
-## 🚀 Установка и быстрый запуск
+## 🚀 Установка в одну команду (Без скачивания репозитория)
 
-### 1. Автоматическая глобальная установка (Одной командой)
+Вам **не нужно** вручную скачивать или клонировать репозиторий. Достаточно вставить одну команду в терминал:
 
-#### Windows (PowerShell)
+### 🪟 Windows (PowerShell)
 ```powershell
-cd C:\Users\kpubaQ\.gemini\antigravity\scratch\apogee
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1
+irm https://raw.githubusercontent.com/Kpubaq/apogee/main/scripts/install.ps1 | iex
 ```
 
-#### Linux & macOS (Bash)
+### 🍎 macOS / 🐧 Linux (Терминал)
 ```bash
-chmod +x scripts/install.sh
-./scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/Kpubaq/apogee/main/scripts/install.sh | bash
 ```
 
-После установки команда `apogee` становится доступна глобально в любой точке терминала.
+### 📦 Через NPM (Глобально)
+```bash
+npm install -g github:Kpubaq/apogee
+```
+
+*(Требуется установленный [Node.js](https://nodejs.org) v18+)*
 
 ---
 
-### 2. Запуск AntiGravity с отладочным портом
+### Альтернатива: Мгновенный запуск через NPX (Без установки)
+
+```bash
+npx github:Kpubaq/apogee
+```
+
+---
+
+## 🕹️ Запуск AntiGravity с отладочным портом
 
 Запустите вашу среду разработки с флагом `--remote-debugging-port`:
 
@@ -78,9 +89,19 @@ chmod +x scripts/install.sh
 & "Antigravity.exe" --remote-debugging-port=9333
 ```
 
+```bash
+# macOS
+open -a "Antigravity IDE" --args --remote-debugging-port=9334
+
+# Linux
+antigravity-ide --remote-debugging-port=9334
+```
+
 ---
 
-### 3. Запуск Apogee
+## 💻 Команды CLI
+
+После установки команда `apogee` доступна глобально в любом терминале:
 
 ```bash
 # Открыть интерактивный терминальный Dashboard
@@ -114,14 +135,6 @@ npm run watchdog
 | `/app [ide\|agent\|ag2]` | Переключение активной цели |
 | `/stop` | Принудительная остановка работы агента |
 | `/shutdown` | Выключение сервера Apogee |
-
----
-
-## 🛡️ Архитектура безопасности
-
-1. **Белые списки:** Доступ строго ограничен через `TELEGRAM_ALLOWED_USERS`, `WHATSAPP_ALLOWED_NUMBERS` и `DISCORD_ALLOWED_CHANNELS`.
-2. **Изоляция каналов:** Разрыв связи в WhatsApp или Telegram не прерывает работу остальных адаптеров.
-3. **Безопасность сессий:** Сессионные токены и ключи WhatsApp хранятся локально в `sessions/` и защищены `.gitignore`.
 
 ---
 
