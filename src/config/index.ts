@@ -50,45 +50,58 @@ export interface ApogeeConfig {
   };
 }
 
+function cleanString(val?: string, defaultVal: string = ''): string {
+  if (!val) return defaultVal;
+  return val.trim().replace(/^["']|["']$/g, '').trim();
+}
+
 function parseCsv(val?: string): string[] {
   if (!val) return [];
-  return val.split(',').map(s => s.trim()).filter(Boolean);
+  return cleanString(val).split(',').map(s => cleanString(s)).filter(Boolean);
 }
 
 function parseBool(val?: string, defaultVal: boolean = false): boolean {
   if (!val) return defaultVal;
-  return val.toLowerCase() === 'true' || val === '1';
+  const clean = cleanString(val).toLowerCase();
+  return clean === 'true' || clean === '1';
+}
+
+function cleanToken(val?: string): string {
+  if (!val) return '';
+  const clean = cleanString(val);
+  if (clean.startsWith('your_') || clean.includes('from_botfather') || clean.includes('token_here')) return '';
+  return clean;
 }
 
 export const config: ApogeeConfig = {
-  appName: process.env.APP_NAME || 'Apogee',
-  author: process.env.AUTHOR || 'ByKpubaq | Adil',
+  appName: cleanString(process.env.APP_NAME, 'Apogee'),
+  author: cleanString(process.env.AUTHOR, 'ByKpubaq | Adil'),
   debugMode: parseBool(process.env.DEBUG_MODE, false),
-  defaultAppTarget: (process.env.DEFAULT_APP_TARGET || 'ide') as 'ide' | 'agent' | 'ag2',
+  defaultAppTarget: (cleanString(process.env.DEFAULT_APP_TARGET, 'ide')) as 'ide' | 'agent' | 'ag2',
   autoAcceptDefault: parseBool(process.env.AUTOACCEPT_DEFAULT, true),
-  defaultModel: process.env.DEFAULT_MODEL || 'Gemini 3.7 Flash (High)',
+  defaultModel: cleanString(process.env.DEFAULT_MODEL, 'Gemini 3.7 Flash (High)'),
 
   cdp: {
-    host: process.env.CDP_HOST || '127.0.0.1',
-    agentPort: Number(process.env.AGENT_CDP_PORT) || 9333,
-    idePort: Number(process.env.IDE_CDP_PORT) || 9334,
+    host: cleanString(process.env.CDP_HOST, '127.0.0.1'),
+    agentPort: Number(cleanString(process.env.AGENT_CDP_PORT)) || 9333,
+    idePort: Number(cleanString(process.env.IDE_CDP_PORT)) || 9334,
   },
 
   telegram: {
     enabled: parseBool(process.env.TELEGRAM_ENABLED, true),
-    botToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    botToken: cleanToken(process.env.TELEGRAM_BOT_TOKEN),
     allowedUsers: parseCsv(process.env.TELEGRAM_ALLOWED_USERS),
   },
 
   discord: {
     enabled: parseBool(process.env.DISCORD_ENABLED, false),
-    botToken: process.env.DISCORD_BOT_TOKEN || '',
-    clientId: process.env.DISCORD_CLIENT_ID || '',
+    botToken: cleanString(process.env.DISCORD_BOT_TOKEN),
+    clientId: cleanString(process.env.DISCORD_CLIENT_ID),
     allowedChannels: parseCsv(process.env.DISCORD_ALLOWED_CHANNELS),
   },
 
   api: {
-    port: Number(process.env.API_PORT) || 3890,
-    secretKey: process.env.API_SECRET_KEY || 'apogee-secret-key-change-me',
+    port: Number(cleanString(process.env.API_PORT)) || 3890,
+    secretKey: cleanString(process.env.API_SECRET_KEY, 'apogee-secret-key-change-me'),
   }
 };
