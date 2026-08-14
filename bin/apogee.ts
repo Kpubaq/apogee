@@ -1,3 +1,9 @@
+#!/usr/bin/env node
+/**
+ * Apogee - Command Line Interface (CLI) & 2026 Cyberdeck Mission Control
+ * Designed by ByKpubaq | Adil
+ */
+
 import { Command } from 'commander';
 import chalk from 'chalk';
 import readline from 'readline';
