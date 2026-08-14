@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * Apogee - Command Line Interface (CLI) & Interactive Mission Control
- * ByKpubaq | Adil
+ * Apogee - Command Line Interface (CLI) & 2026 Cyberdeck Mission Control
+ * Designed by ByKpubaq | Adil
  */
 
 import { Command } from 'commander';
 import chalk from 'chalk';
 import readline from 'readline';
-import { printBanner, getApogeeBanner } from '../src/utils/banner.js';
+import { printBanner, getApogeeBanner, renderCyberCard, padBoxLine } from '../src/utils/banner.js';
+import { logger } from '../src/utils/logger.js';
 import { CDPClient } from '../src/cdp/CDPClient.js';
 import { ScreenCapture } from '../src/cdp/ScreenCapture.js';
 import { TerminalQR } from '../src/utils/qr.js';
@@ -16,75 +17,118 @@ const program = new Command();
 
 program
   .name('apogee')
-  .description('Apogee Mission Control for AntiGravity 2.0 / IDE / CLI (ByKpubaq | Adil)')
+  .description('Apogee 2026 Universal Mission Control for AntiGravity 2.0 / IDE / CLI (ByKpubaq | Adil)')
   .version('2.0.0');
 
+// ==========================================
+// CLI COMMAND: STATUS & TELEMETRY
+// ==========================================
 program
   .command('status')
-  .description('Проверить статус подключения к AntiGravity 2.0 / IDE (9334) и CLI (9333)')
+  .description('Scan and report live CDP connectivity for AntiGravity 2.0 (9334) & CLI (9333)')
   .action(async () => {
     printBanner();
-    console.log(chalk.bold.cyan('🔍 Сканирование доступных портов AntiGravity...\n'));
+    console.log(chalk.hex('#00F0FF').bold('  🔍 Scanning AntiGravity CDP Network Surface...\n'));
 
     const ideClient = new CDPClient('127.0.0.1', 9334, 'AntiGravity 2.0 / IDE');
     const appClient = new CDPClient('127.0.0.1', 9333, 'AntiGravity Standalone CLI');
 
+    const statusLines: string[] = [];
+
+    // Probe IDE CDP (Port 9334)
     try {
       const ideTargets = await ideClient.fetchTargets();
-      console.log(`${chalk.green('✔ AntiGravity 2.0 / IDE (Port 9334):')} ${chalk.bold.green('ONLINE')} (${ideTargets.length} окон)`);
-      ideTargets.forEach(t => console.log(`   ${chalk.gray('└─')} [${t.type}] ${chalk.white(t.title)}`));
+      statusLines.push(
+        `${chalk.hex('#10B981').bold('🟢 ONLINE')}  ${chalk.bold.white('AntiGravity 2.0 / IDE')} ${chalk.hex('#64748B')('(Port 9334)')} — ${chalk.hex('#00FF9D')(`${ideTargets.length} active window(s)`)}`
+      );
+      ideTargets.forEach((t, idx) => {
+        const icon = t.type === 'page' ? '🖥️ ' : '⚙️ ';
+        statusLines.push(`    ${chalk.hex('#8B5CF6')('├─')} ${icon} ${chalk.hex('#94A3B8')(`[${t.type}]`)} ${chalk.hex('#E2E8F0')(t.title || 'Untitled Target')}`);
+        if (idx === ideTargets.length - 1) {
+          statusLines.push(`    ${chalk.hex('#64748B')(`└─► Target ID: ${t.id}`)}`);
+        }
+      });
     } catch (e: any) {
-      console.log(`${chalk.red('✖ AntiGravity 2.0 / IDE (Port 9334):')} ${chalk.red('OFFLINE')} (${e.message})`);
+      statusLines.push(
+        `${chalk.hex('#F43F5E').bold('🔴 OFFLINE')} ${chalk.bold.white('AntiGravity 2.0 / IDE')} ${chalk.hex('#64748B')('(Port 9334)')} — ${chalk.hex('#FDA4AF')(e.message)}`
+      );
+      statusLines.push(`    ${chalk.hex('#64748B')('└─► Tip: Launch IDE with --remote-debugging-port=9334')}`);
     }
 
+    statusLines.push('');
+
+    // Probe Standalone CLI CDP (Port 9333)
     try {
       const appTargets = await appClient.fetchTargets();
-      console.log(`\n${chalk.green('✔ AntiGravity CLI / App (Port 9333):')} ${chalk.bold.green('ONLINE')} (${appTargets.length} окон)`);
-      appTargets.forEach(t => console.log(`   ${chalk.gray('└─')} [${t.type}] ${chalk.white(t.title)}`));
+      statusLines.push(
+        `${chalk.hex('#10B981').bold('🟢 ONLINE')}  ${chalk.bold.white('AntiGravity Standalone CLI')} ${chalk.hex('#64748B')('(Port 9333)')} — ${chalk.hex('#00FF9D')(`${appTargets.length} target(s)`)}`
+      );
+      appTargets.forEach(t => {
+        statusLines.push(`    ${chalk.hex('#8B5CF6')('└─')} ⚙️  ${chalk.hex('#94A3B8')(`[${t.type}]`)} ${chalk.hex('#E2E8F0')(t.title || 'CLI Surface')}`);
+      });
     } catch (e: any) {
-      console.log(`\n${chalk.red('✖ AntiGravity CLI / App (Port 9333):')} ${chalk.red('OFFLINE')} (${e.message})`);
+      statusLines.push(
+        `${chalk.hex('#94A3B8').bold('⚪ STANDBY')} ${chalk.bold.white('AntiGravity Standalone CLI')} ${chalk.hex('#64748B')('(Port 9333)')} — ${chalk.hex('#94A3B8')(e.message)}`
+      );
     }
+
+    console.log(renderCyberCard('TELEMETRY SCAN REPORT', statusLines, '#00F0FF'));
     console.log('\n');
   });
 
+// ==========================================
+// CLI COMMAND: SCREENSHOT
+// ==========================================
 program
   .command('screenshot')
-  .description('Снять моментальный скриншот активного окна AntiGravity')
-  .option('-p, --port <number>', 'Порт CDP (по умолчанию 9334)', '9334')
+  .description('Instant viewport screenshot capture of active AntiGravity window')
+  .option('-p, --port <number>', 'CDP Port (defaults to 9334)', '9334')
   .action(async (opts: { port?: string }) => {
     const port = Number(opts.port);
     const client = new CDPClient('127.0.0.1', port, 'AntiGravity');
+    
+    console.log(chalk.hex('#00F0FF')(`\n  📸 Initiating viewport capture on 127.0.0.1:${port}...`));
     const connected = await client.connect();
 
     if (!connected) {
-      console.error(chalk.red(`Ошибка: Не удалось подключиться к CDP на порту ${port}`));
+      console.log(renderCyberCard('CAPTURE FAILED', [
+        `${chalk.hex('#F43F5E').bold('✖ Connection Error:')} Unable to reach CDP endpoint on port ${port}`,
+        chalk.hex('#94A3B8')('Please ensure AntiGravity 2.0 is running with remote debugging enabled.')
+      ], '#F43F5E'));
       process.exit(1);
     }
 
     const capture = new ScreenCapture(client);
     const res = await capture.capture();
-    console.log(chalk.green(`✔ Скриншот успешно сохранен: ${res.filePath}`));
+
+    console.log(renderCyberCard('VIEWPORT CAPTURE READY', [
+      `${chalk.hex('#10B981').bold('✔ Status:')}       Capture successfully encoded and written to disk`,
+      `${chalk.hex('#38BDF8').bold('📁 File Path:')}    ${chalk.hex('#F1F5F9')(res.filePath)}`,
+      `${chalk.hex('#A855F7').bold('📊 File Size:')}    ${chalk.hex('#FDE047')(`${(res.buffer.length / 1024).toFixed(1)} KB`)}`,
+      `${chalk.hex('#EC4899').bold('⚡ Latency:')}      ${chalk.hex('#00FF9D')('Real-time Surface Pipe')}`
+    ], '#10B981'));
+
     await client.close();
+    console.log('\n');
   });
 
+// ==========================================
+// CLI COMMAND: QR PAIRING
+// ==========================================
 program
   .command('qr')
-  .description('Сгенерировать и показать QR-код привязки WhatsApp Web в терминале')
+  .description('Generate WhatsApp Multi-Device pairing QR matrix in terminal')
   .action(() => {
     printBanner();
-    TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'Apogee WhatsApp Web Link');
+    TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'Apogee WhatsApp MD Pairing Matrix');
   });
 
-program
-  .command('start')
-  .description('Запустить фоновый сервис Apogee (Telegram, WhatsApp, Discord, API)')
-  .action(async () => {
-    await import('../src/index.js');
-  });
-
+// ==========================================
+// CLI COMMAND: CREATE PROJECT
+// ==========================================
 program
   .command('create <name>')
-  .description('Создать новый проект в AntiGravity и открыть его')
+  .description('Scaffold and initialize a new project workspace in AntiGravity')
   .action(async (name: string) => {
     printBanner();
     const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
@@ -92,170 +136,338 @@ program
     const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
     const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
     const res = await ws.createProject(name);
-    console.log(chalk.green(`\n${res.message}\n`));
+
+    console.log(renderCyberCard('WORKSPACE CREATION', [
+      `${chalk.hex('#10B981').bold('✔ Result:')}    ${res.message}`,
+      `${chalk.hex('#38BDF8').bold('📂 Target:')}    ~/AntiGravityProjects/${name}`,
+      `${chalk.hex('#A855F7').bold('⚙️ Status:')}    Workspace active and attached to IDE context`
+    ], '#818CF8'));
+
     await client.close();
+    console.log('\n');
   });
 
+// ==========================================
+// CLI COMMAND: OPEN WORKSPACE
+// ==========================================
 program
   .command('open <path>')
-  .description('Открыть существующую папку/проект в AntiGravity')
+  .description('Open existing workspace directory in AntiGravity IDE')
   .action(async (targetPath: string) => {
     printBanner();
     const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
     await client.connect().catch(() => {});
     const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
     const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
-    const res = await ws.openProject(targetPath);
-    console.log(chalk.green(`\n${res.message}\n`));
+
+    try {
+      const res = await ws.openProject(targetPath);
+      console.log(renderCyberCard('WORKSPACE SWITCH', [
+        `${chalk.hex('#10B981').bold('✔ Workspace Opened:')} ${res.message}`,
+        `${chalk.hex('#38BDF8').bold('📂 Path:')}             ${targetPath}`
+      ], '#00F0FF'));
+    } catch (e: any) {
+      console.log(renderCyberCard('WORKSPACE SWITCH FAILED', [
+        `${chalk.hex('#F43F5E').bold('✖ Error:')} ${e.message}`,
+        `${chalk.hex('#94A3B8')('Check that the directory exists and permissions are valid.')}`
+      ], '#F43F5E'));
+    }
+
     await client.close();
+    console.log('\n');
   });
 
+// ==========================================
+// CLI COMMAND: LIST PROJECTS
+// ==========================================
 program
   .command('projects')
-  .description('Показать список проектов в рабочей директории')
+  .description('List all managed workspaces in ~/AntiGravityProjects')
   .action(async () => {
     printBanner();
     const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
     const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
     const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
     const list = await ws.listProjects();
-    console.log(chalk.bold.cyan('📂 Список проектов в ~/AntiGravityProjects:'));
+
+    const lines: string[] = [];
     if (list.length === 0) {
-      console.log(chalk.gray('   Папка пуста. Создайте проект через: apogee create <имя>'));
+      lines.push(chalk.hex('#94A3B8')('No projects found in ~/AntiGravityProjects.'));
+      lines.push(chalk.hex('#64748B')('Create one with: apogee create <projectName>'));
     } else {
-      list.forEach((p, i) => console.log(`   ${chalk.yellow(`${i + 1}.`)} ${chalk.white(p)}`));
+      lines.push(`${chalk.hex('#38BDF8').bold('Total Managed Projects:')} ${chalk.hex('#00FF9D').bold(list.length)}`);
+      lines.push('');
+      list.forEach((p, i) => {
+        lines.push(`  ${chalk.hex('#F59E0B').bold(`[${String(i + 1).padStart(2, '0')}]`)}  📁  ${chalk.hex('#F1F5F9').bold(p)}`);
+      });
     }
+
+    console.log(renderCyberCard('PROJECT REPOSITORY MATRIX', lines, '#A855F7'));
     console.log('\n');
   });
 
+// ==========================================
+// CLI COMMAND: START 24/7 SERVICE
+// ==========================================
+program
+  .command('start')
+  .description('Start the full 24/7 background mission control daemon (Telegram, WA, Discord, CDP)')
+  .action(async () => {
+    await import('../src/index.js');
+  });
+
+// ==========================================
+// CLI DEFAULT COMMAND: INTERACTIVE DASHBOARD
+// ==========================================
 program
   .command('dashboard', { isDefault: true })
-  .description('Открыть интерактивный терминальный Mission Control дашборд')
+  .description('Launch the 2026 Interactive Cyberdeck Dashboard')
   .action(async () => {
     console.clear();
     printBanner();
-    runInteractiveDashboard();
+    await runInteractiveDashboard();
   });
 
-function runInteractiveDashboard() {
+/**
+ * Helper to prompt a question asynchronously
+ */
+function ask(rl: readline.Interface, query: string): Promise<string> {
+  return new Promise(resolve => rl.question(query, ans => resolve(ans.trim())));
+}
+
+/**
+ * Interactive Cyberdeck Control Room
+ */
+async function runInteractiveDashboard() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
-  console.log(chalk.bold.yellow('🕹️  ИНТЕРАКТИВНОЕ МЕНЮ APOGEE:'));
-  console.log(`
-  ${chalk.cyan('1.')} Проверить статус подключения (Status & Ports)
-  ${chalk.cyan('2.')} Сделать моментальный скриншот IDE (Screenshot)
-  ${chalk.cyan('3.')} Показать QR-код WhatsApp Web (QR Pairing)
-  ${chalk.cyan('4.')} Создать новый проект в AntiGravity (Create Project)
-  ${chalk.cyan('5.')} Открыть существующий проект (Open Project)
-  ${chalk.cyan('6.')} Список доступных проектов (List Projects)
-  ${chalk.cyan('7.')} Отправить промпт агенту (Send Prompt)
-  ${chalk.cyan('8.')} Запустить полный фоновый сервис 24/7 (Start Server)
-  ${chalk.cyan('9.')} Выйти (Exit)
-`);
+  const renderDashboardMenu = () => {
+    const W = 76;
+    const border = (char: string) => chalk.hex('#00F0FF')(char);
+    const catHeader = (icon: string, title: string, colorHex: string) =>
+      `  ${chalk.hex(colorHex).bold(icon)} ${chalk.hex(colorHex).bold(title)}`;
 
-  rl.question(chalk.bold.magenta('Выберите действие [1-9]: '), async (answer) => {
-    const choice = answer.trim();
+    const titleText = ' [ APOGEE 2026 INTERACTIVE CYBERDECK CONTROL ROOM ] ';
+    const topDash = Math.max(0, W - titleText.length - 2);
+    console.log(border('╭─') + chalk.hex('#00F0FF').bold(titleText) + border('─'.repeat(topDash) + '╮'));
+    console.log(border('│') + ' '.repeat(W) + border('│'));
 
-    switch (choice) {
+    // Category 1: Rapid Telemetry
+    console.log(border('│') + padBoxLine(catHeader('🕹️', 'RAPID TELEMETRY & VIEWPORT ACTIONS', '#00F0FF'), W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[1]')} 📊 ${chalk.white.bold('System Status & Telemetry')}     ${chalk.hex('#64748B')('• Proactive CDP probe (9334/9333)')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[2]')} 📸 ${chalk.white.bold('Instant IDE Viewport Capture')}  ${chalk.hex('#64748B')('• Direct screenshot buffer encode')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#00F0FF').bold('[7]')} 💬 ${chalk.white.bold('Send Real-Time Agent Prompt')}   ${chalk.hex('#64748B')('• Live injection into AntiGravity UI')}`, W) + border('│'));
+    console.log(border('│') + ' '.repeat(W) + border('│'));
+
+    // Category 2: Workspace & Projects
+    console.log(border('│') + padBoxLine(catHeader('📂', 'WORKSPACE & PROJECT MANAGEMENT', '#818CF8'), W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#818CF8').bold('[4]')} 📂 ${chalk.white.bold('Create New Project in AG')}       ${chalk.hex('#64748B')('• Scaffold & attach new folder')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#818CF8').bold('[5]')} 📂 ${chalk.white.bold('Open Existing Workspace')}        ${chalk.hex('#64748B')('• Switch active workspace context')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#818CF8').bold('[6]')} 🗂️  ${chalk.white.bold('List Managed Projects')}         ${chalk.hex('#64748B')('• View project repository tree')}`, W) + border('│'));
+    console.log(border('│') + ' '.repeat(W) + border('│'));
+
+    // Category 3: Omnichannel & Pairing
+    console.log(border('│') + padBoxLine(catHeader('📱', 'OMNICHANNEL & DEVICE PAIRING', '#EC4899'), W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#EC4899').bold('[3]')} 🟢 ${chalk.white.bold('WhatsApp Web Pairing (MD QR)')}    ${chalk.hex('#64748B')('• Multi-Device pairing matrix')}`, W) + border('│'));
+    console.log(border('│') + ' '.repeat(W) + border('│'));
+
+    // Category 4: Daemon & Mission Control
+    console.log(border('│') + padBoxLine(catHeader('⚙️', 'CORE DAEMON & SYSTEM CONTROL', '#10B981'), W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#10B981').bold('[8]')} 🚀 ${chalk.white.bold('Launch 24/7 Mission Control')}    ${chalk.hex('#64748B')('• Telegram/WhatsApp/Discord Daemon')}`, W) + border('│'));
+    console.log(border('│') + padBoxLine(`   ${chalk.hex('#F43F5E').bold('[9]')} ❌ ${chalk.white.bold('Exit Mission Control')}          ${chalk.hex('#64748B')('• Terminate interactive session')}`, W) + border('│'));
+    console.log(border('│') + ' '.repeat(W) + border('│'));
+
+    console.log(border('╰' + '─'.repeat(W) + '╯\n'));
+  };
+
+  renderDashboardMenu();
+
+  const promptUser = async () => {
+    const choice = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.hex('#EC4899').bold('Select Action')} ${chalk.hex('#64748B')('[1-9 | q]')}: `);
+
+    switch (choice.toLowerCase()) {
       case '1': {
-        const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity 2.0 / IDE');
+        console.log(chalk.hex('#00F0FF')('\n  🔍 Querying CDP ports...'));
+        const ideClient = new CDPClient('127.0.0.1', 9334, 'AntiGravity 2.0 / IDE');
         try {
-          const targets = await client.fetchTargets();
-          console.log(chalk.green(`\n✔ AntiGravity 2.0 / IDE: ONLINE (${targets.length} окон)`));
+          const targets = await ideClient.fetchTargets();
+          console.log(renderCyberCard('CDP 9334 STATUS', [
+            `${chalk.hex('#10B981').bold('🟢 ONLINE')} — ${targets.length} target window(s) discovered:`,
+            ...targets.map(t => `   ${chalk.hex('#8B5CF6')('◆')} ${chalk.hex('#38BDF8')(`[${t.type}]`)} ${chalk.white(t.title || 'Untitled')}`)
+          ], '#10B981'));
         } catch (e: any) {
-          console.log(chalk.red(`\n✖ AntiGravity 2.0 / IDE: OFFLINE (${e.message})`));
+          console.log(renderCyberCard('CDP 9334 STATUS', [
+            `${chalk.hex('#F43F5E').bold('🔴 OFFLINE')} — ${e.message}`,
+            chalk.hex('#94A3B8')('AntiGravity IDE is not responding on port 9334.')
+          ], '#F43F5E'));
         }
-        rl.close();
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '2': {
+        console.log(chalk.hex('#00F0FF')('\n  📸 Capturing active viewport...'));
         const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
         if (await client.connect()) {
           const cap = new ScreenCapture(client);
           const res = await cap.capture();
-          console.log(chalk.green(`\n✔ Снимок сохранен: ${res.filePath}`));
+          console.log(renderCyberCard('VIEWPORT CAPTURE', [
+            `${chalk.hex('#10B981').bold('✔ Screenshot Saved:')} ${chalk.white(res.filePath)}`,
+            `${chalk.hex('#38BDF8').bold('📊 Size:')}             ${(res.buffer.length / 1024).toFixed(1)} KB`
+          ], '#10B981'));
           await client.close();
         } else {
-          console.log(chalk.red('\n✖ AntiGravity не запущена на порту 9334.'));
+          console.log(renderCyberCard('CAPTURE FAILED', [
+            `${chalk.hex('#F43F5E').bold('✖ Connection Error:')} AntiGravity 2.0 is not reachable on port 9334.`
+          ], '#F43F5E'));
         }
-        rl.close();
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '3': {
-        TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'Apogee WhatsApp Web Link');
-        rl.close();
+        console.log('');
+        TerminalQR.render(`2@APOGEE_PAIR_${Date.now()}_BYKPUBAQ_ADIL`, 'WhatsApp MD Pair Matrix');
+        await ask(rl, chalk.hex('#64748B')('  Press Enter to return to Dashboard...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '4': {
-        rl.question(chalk.cyan('Введите имя нового проекта: '), async (projName) => {
+        const projName = await ask(rl, `  ${chalk.hex('#818CF8').bold('❯')} ${chalk.white('Enter New Project Name:')} `);
+        if (projName) {
           const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
           await client.connect().catch(() => {});
           const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
           const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
           const res = await ws.createProject(projName);
-          console.log(chalk.green(`\n${res.message}\n`));
+          console.log(renderCyberCard('PROJECT CREATED', [
+            `${chalk.hex('#10B981').bold('✔ Success:')} ${res.message}`
+          ], '#818CF8'));
           await client.close();
-          rl.close();
-        });
+        }
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '5': {
-        rl.question(chalk.cyan('Введите путь к папке: '), async (folderPath) => {
+        const folderPath = await ask(rl, `  ${chalk.hex('#818CF8').bold('❯')} ${chalk.white('Enter Workspace Path:')} `);
+        if (folderPath) {
           const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
           await client.connect().catch(() => {});
           const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
           const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
           try {
             const res = await ws.openProject(folderPath);
-            console.log(chalk.green(`\n${res.message}\n`));
+            console.log(renderCyberCard('WORKSPACE OPENED', [
+              `${chalk.hex('#10B981').bold('✔ Success:')} ${res.message}`
+            ], '#818CF8'));
           } catch (e: any) {
-            console.log(chalk.red(`\n✖ ${e.message}\n`));
+            console.log(renderCyberCard('OPEN FAILED', [
+              `${chalk.hex('#F43F5E').bold('✖ Error:')} ${e.message}`
+            ], '#F43F5E'));
           }
           await client.close();
-          rl.close();
-        });
+        }
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '6': {
         const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
         const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
         const ws = new (await import('../src/cdp/WorkspaceManager.js')).WorkspaceManager(client, watcher);
         const list = await ws.listProjects();
-        console.log(chalk.bold.cyan('\n📂 Доступные проекты:'));
-        list.forEach((p, i) => console.log(`   ${chalk.yellow(`${i + 1}.`)} ${chalk.white(p)}`));
-        console.log('\n');
-        rl.close();
+        
+        const lines: string[] = [];
+        if (list.length === 0) {
+          lines.push(chalk.hex('#94A3B8')('No projects found in ~/AntiGravityProjects.'));
+        } else {
+          list.forEach((p, i) => lines.push(`  ${chalk.hex('#F59E0B').bold(`[${i + 1}]`)}  📁  ${chalk.white.bold(p)}`));
+        }
+
+        console.log(renderCyberCard('PROJECTS MATRIX', lines, '#A855F7'));
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '7': {
-        rl.question(chalk.cyan('Введите сообщение для агента: '), async (promptText) => {
+        const promptText = await ask(rl, `  ${chalk.hex('#00F0FF').bold('❯')} ${chalk.white('Enter Prompt for AntiGravity Agent:')} `);
+        if (promptText) {
           const client = new CDPClient('127.0.0.1', 9334, 'AntiGravity');
           if (await client.connect()) {
             const watcher = new (await import('../src/cdp/TaskWatcher.js')).TaskWatcher(client);
             await watcher.sendUserPrompt(promptText);
-            console.log(chalk.green('✔ Промпт передан в интерфейс AntiGravity!'));
+            console.log(renderCyberCard('PROMPT DISPATCHED', [
+              `${chalk.hex('#10B981').bold('✔ Dispatched:')} Prompt sent to AntiGravity UI context`,
+              `${chalk.hex('#38BDF8').bold('📝 Prompt:')}     "${promptText}"`
+            ], '#00F0FF'));
             await client.close();
           } else {
-            console.log(chalk.red('✖ AntiGravity недоступна.'));
+            console.log(renderCyberCard('PROMPT FAILED', [
+              `${chalk.hex('#F43F5E').bold('✖ Error:')} AntiGravity IDE is not reachable on port 9334.`
+            ], '#F43F5E'));
           }
-          rl.close();
-        });
+        }
+        await ask(rl, chalk.hex('#64748B')('\n  Press Enter to continue...'));
+        console.clear();
+        printBanner();
+        renderDashboardMenu();
+        await promptUser();
         break;
       }
+
       case '8': {
+        console.log(chalk.hex('#10B981').bold('\n  🚀 Launching Apogee 24/7 Mission Control Server...\n'));
         rl.close();
         await import('../src/index.js');
         break;
       }
-      default:
-        console.log(chalk.gray('Выход из дашборда.'));
+
+      case '9':
+      case 'q':
+      case 'exit': {
+        console.log(chalk.hex('#64748B')('\n  ⚡ Session terminated. Farewell, Operator.\n'));
         rl.close();
         process.exit(0);
+        break;
+      }
+
+      default: {
+        console.log(chalk.hex('#F59E0B')('  ▲ Invalid selection. Please enter a number between 1 and 9.'));
+        await promptUser();
+        break;
+      }
     }
-  });
+  };
+
+  await promptUser();
 }
 
 program.parse(process.argv);

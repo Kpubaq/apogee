@@ -86,7 +86,7 @@ export const config: ApogeeConfig = {
 
   whatsapp: {
     enabled: parseBool(process.env.WHATSAPP_ENABLED, true),
-    sessionPath: path.resolve(process.env.WHATSAPP_SESSION_PATH || './sessions/whatsapp'),
+    sessionPath: path.resolve(process.env.WHATSAPP_SESSION_PATH || './.apogee/sessions/whatsapp'),
     selfChatMode: parseBool(process.env.WHATSAPP_SELF_CHAT_MODE, true),
     allowedNumbers: parseCsv(process.env.WHATSAPP_ALLOWED_NUMBERS),
   },
