@@ -42,6 +42,7 @@ export class WhatsAppAdapter extends BaseAdapter {
     }
 
     logger.info('WhatsAppAdapter', `Initializing Unofficial WhatsApp Web Session at: ${this.sessionPath}`);
+    logger.warn('WhatsAppAdapter', '⚠️ DISCLAIMER: Unofficial WhatsApp Web automation carries risk of account bans by Meta Platforms, Inc. The author bears NO liability. Use at your own risk.');
     this.isRunning = true;
 
     // Simulate/display QR code pairing terminal display

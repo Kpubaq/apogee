@@ -133,6 +133,16 @@ npm run watchdog
 
 ---
 
+## ⚠️ Disclaimer & Limitation of Liability
+
+> [!WARNING]
+> **Unofficial API & Third-Party Terms of Service Notice:**
+> - **Apogee** is an independent, open-source tool and is **NOT** affiliated, associated, authorized, endorsed by, or in any way officially connected with **Meta Platforms, Inc.**, **WhatsApp**, **Telegram FZ-LLC**, **Discord Inc.**, or **Google LLC**.
+> - The WhatsApp integration utilizes reverse-engineered / unofficial web automation protocols. Using automated tools or bots with personal or business WhatsApp accounts may violate WhatsApp's Terms of Service and can result in account limitations, temporary suspensions, or **permanent phone number bans** by Meta.
+> - **User Bears 100% Responsibility:** The author (**ByKpubaq | Adil**) and contributors bear **NO responsibility or liability** for any account bans, suspensions, data loss, or service terminations resulting from your use of this software. You use this software strictly at your own discretion and risk.
+
+---
+
 ## 📄 License & Attribution
 
 This project is licensed under the **Apogee Non-Commercial License (Version 1.0)**.
