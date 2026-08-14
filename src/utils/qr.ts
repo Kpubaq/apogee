@@ -10,7 +10,7 @@ export class TerminalQR {
     console.log('\n' + chalk.bold.cyan(`═══════════════ [ ${title} ] ═══════════════`));
     console.log(chalk.gray('Scan this QR code with WhatsApp on your phone (Linked Devices -> Link a Device):\n'));
 
-    qrcode.generate(qrString, { small: true }, (qr) => {
+    qrcode.generate(qrString, { small: true }, (qr: string) => {
       console.log(qr);
     });
 

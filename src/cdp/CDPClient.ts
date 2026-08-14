@@ -117,7 +117,7 @@ export class CDPClient {
           });
         });
 
-        this.ws.on('error', (err) => {
+        this.ws.on('error', (err: any) => {
           logger.error('CDP', `WebSocket error on port ${this.port}: ${err.message}`);
           if (!this.isConnected) {
             reject(err);

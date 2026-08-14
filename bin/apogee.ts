@@ -51,7 +51,7 @@ program
   .command('screenshot')
   .description('Снять моментальный скриншот активного окна AntiGravity')
   .option('-p, --port <number>', 'Порт CDP (по умолчанию 9334)', '9334')
-  .action(async (opts) => {
+  .action(async (opts: { port?: string }) => {
     const port = Number(opts.port);
     const client = new CDPClient('127.0.0.1', port, 'AntiGravity');
     const connected = await client.connect();

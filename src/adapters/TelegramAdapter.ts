@@ -94,7 +94,7 @@ export class TelegramAdapter extends BaseAdapter {
     if (caption) formData.append('caption', caption);
     formData.append('parse_mode', 'Markdown');
     
-    const blob = new Blob([buffer], { type: 'image/png' });
+    const blob = new Blob([new Uint8Array(buffer)], { type: 'image/png' });
     formData.append('photo', blob, 'screenshot.png');
 
     const res = await fetch(`https://api.telegram.org/bot${this.botToken}/sendPhoto`, {

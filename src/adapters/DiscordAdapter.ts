@@ -58,7 +58,7 @@ export class DiscordAdapter extends BaseAdapter {
     if (photoBuffer) {
       const formData = new FormData();
       formData.append('content', text);
-      const blob = new Blob([photoBuffer], { type: 'image/png' });
+      const blob = new Blob([new Uint8Array(photoBuffer)], { type: 'image/png' });
       formData.append('file', blob, 'screenshot.png');
 
       await fetch(`https://discord.com/api/v10/channels/${chatId}/messages`, {
