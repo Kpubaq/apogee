@@ -1,15 +1,17 @@
 <div align="center">
 
 ```
-    ___    ____  ____  ____________ ____ 
-   /   |  / __ \/ __ \/ ____/ ____// __ \
-  / /| | / /_/ / / / / / __/ __/  / /_/ /
- / ___ |/ ____/ /_/ / /_/ / /___ / ____/ 
-/_/  |_/_/    \____/\____/_____//_/      
+    ___    ____  ____  ______ ______ ______
+   /   |  / __ \/ __ \/ ____// ____// ____/
+  / /| | / /_/ / / / / / __ / __/  / __/   
+ / ___ |/ ____/ /_/ / /_/ // /___ / /___   
+/_/  |_/_/    \____/\____//_____//_____/   
 ```
 
 ### 🛰️ Universal Mission Control for AntiGravity 2.0 / IDE / CLI
 **Created by ByKpubaq | Adil**
+
+🌍 **Languages:** [English](README.md) | [Русский](README.ru.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
@@ -20,33 +22,33 @@
 
 </div>
 
-## 🌌 О продукте
+## 🌌 Overview
 
-**Apogee** — это автономный центр управления (Mission Control) нового поколения для AI-агентов **AntiGravity 2.0**, **AntiGravity IDE** и **AntiGravity CLI / Standalone App**.
+**Apogee** is a next-generation autonomous Mission Control suite designed for **AntiGravity 2.0**, **AntiGravity IDE**, and **AntiGravity CLI / Standalone App**.
 
-Продукт позволяет разработчику управлять процессом кодинга, переключать модели, подтверждать действия (*Auto-Accept*), запрашивать моментальные скриншоты и отдавать команды со смартфона через **Telegram**, **неофициальный WhatsApp Web (QR-код в консоли)**, **Discord** и интерактивный терминальный **CLI-интерфейс**.
-
----
-
-## ⚡ Ключевые возможности
-
-### 📱 Омниадаптеры и Мессенджеры
-- 🟢 **WhatsApp Web (Unofficial QR):** Подключение без платных официальных API — сканируйте QR-код прямо в терминале. Поддерживает режим *«Чат с самим собой» (Saved Messages / Note to Self)* или диалог с определенными номерами.
-- 🔵 **Telegram Driver:** Меню с инлайн-кнопками для переключения моделей, отправка скриншотов активного окна, реакции и треды.
-- 🟣 **Discord Driver:** Rich Embeds для карточек телеметрии, доставка скриншотов в каналы и поддержка тредов.
-- 💻 **Interactive CLI Dashboard (`apogee`):** Терминальный центр управления с современным неоновым ASCII-логотипом `Apogee` и маркировкой `ByKpubaq | Adil`.
-
-### 🕹️ Удаленный контроль AntiGravity 2.0 / IDE / CLI
-- ⚡ **Auto-Accept Engine:** Автоматический перехват DOM и подтверждение кнопок *Run*, *Accept*, *Allow*, *Continue*, *Apply* для полной автономности.
-- 📸 **Screen Capture (`/screenshot`):** Моментальный снимок активного окна IDE с компрессией и отправкой в чат.
-- 🤖 **Model Selector (`/model`):** Интерактивное переключение моделей (*Gemini 3.7 Flash*, *Gemini 3.1 Pro*, *Claude Opus 4.6*, *Claude Sonnet 4.6*) и уровней Thinking Effort (*Low*, *Medium*, *High*).
-- 🔀 **Multi-Target Switcher (`/app`):** Мгновенное переключение между AntiGravity 2.0, IDE (порт `9334`) и Standalone CLI / App (порт `9333`).
+It allows developers to remotely pilot their coding agent, switch AI models, confirm actions (*Auto-Accept*), request instant IDE screenshots, and dispatch tasks from their smartphone via **Telegram**, **Unofficial WhatsApp Web (terminal QR-code)**, **Discord**, and an interactive terminal **CLI Dashboard**.
 
 ---
 
-## 🚀 Установка и быстрый запуск
+## ⚡ Key Features
 
-### 1. Автоматическая глобальная установка (Одной командой)
+### 📱 Omnichannel Adapters
+- 🟢 **WhatsApp Web (Unofficial QR Terminal):** Connect without paid official APIs by simply scanning the QR code in your console. Supports *Self-Chat (Note to Self / Saved Messages)* or specific whitelisted phone numbers.
+- 🔵 **Telegram Driver:** Inline keyboard buttons for model selection, instant IDE screenshots, generation progress reactions, and threads.
+- 🟣 **Discord Driver:** Rich Embed cards with real-time telemetry, channel streaming, and screenshot delivery.
+- 💻 **Interactive CLI Dashboard (`apogee`):** Rich terminal control center featuring neon ASCII branding with `ByKpubaq | Adil`.
+
+### 🕹️ Full Remote Control for AntiGravity 2.0 / IDE / CLI
+- ⚡ **Auto-Accept Engine:** Automated DOM observer that clicks *Run*, *Accept*, *Allow*, *Continue*, and *Apply* buttons for seamless autonomous loops.
+- 📸 **Screen Capture (`/screenshot`):** Instant IDE viewport capture compressed and delivered directly to your chat.
+- 🤖 **Model Selector (`/model`):** Live model and Thinking Effort tier switching (*Gemini 3.7 Flash*, *Gemini 3.1 Pro*, *Claude Opus 4.6*, *Claude Sonnet 4.6*).
+- 🔀 **Multi-Target Switcher (`/app`):** Real-time hot-switching between AntiGravity 2.0 / IDE (port `9334`) and Standalone CLI / App (port `9333`).
+
+---
+
+## 🚀 Installation & Quick Start
+
+### 1. Global Installation (One-Command Setup)
 
 #### Windows (PowerShell)
 ```powershell
@@ -60,13 +62,13 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-После установки команда `apogee` становится доступна глобально в любой точке терминала!
+After installation, the `apogee` CLI command is registered globally on your system.
 
 ---
 
-### 2. Запуск AntiGravity с отладочным портом
+### 2. Launch AntiGravity with Debugging Port
 
-Запустите вашу среду разработки с флагом `--remote-debugging-port`:
+Launch your target environment with `--remote-debugging-port`:
 
 ```powershell
 # Windows PowerShell (AntiGravity 2.0 / IDE)
@@ -76,56 +78,64 @@ chmod +x scripts/install.sh
 & "Antigravity.exe" --remote-debugging-port=9333
 ```
 
+```bash
+# macOS
+open -a "Antigravity IDE" --args --remote-debugging-port=9334
+
+# Linux
+antigravity-ide --remote-debugging-port=9334
+```
+
 ---
 
-### 3. Запуск Apogee
+### 3. Launching Apogee
 
 ```bash
-# Открыть интерактивный терминальный Dashboard
+# Open interactive terminal Dashboard
 apogee
 
-# Проверить статус портов и подключения
+# Check CDP ports and connection status
 apogee status
 
-# Получить моментальный скриншот IDE
+# Capture an instant IDE screenshot
 apogee screenshot
 
-# Показать QR-код WhatsApp Web для привязки
+# Display terminal WhatsApp Web pairing QR code
 apogee qr
 
-# Запустить сервер на 24/7 в фоне с авто-перезапуском
+# Run 24/7 background supervisor with auto-restart
 npm run watchdog
 ```
 
 ---
 
-## 📱 Список команд в чате (Telegram / WhatsApp / Discord)
+## 📱 Chat Commands (Telegram / WhatsApp / Discord)
 
-| Команда | Описание |
+| Command | Description |
 |---|---|
-| *(любой текст)* | Отправка промпта напрямую агенту в AntiGravity |
-| `/status` | Статус подключения, порт CDP, модель и телеметрия |
-| `/screenshot` | Моментальный снимок активного окна IDE |
-| `/latest` | Получить последний ответ агента |
-| `/model` | Интерактивное меню выбора модели и Thinking Effort |
-| `/autoaccept` | Переключение автоматического подтверждения кнопок |
-| `/app [ide\|agent\|ag2]` | Переключение активной цели |
-| `/stop` | Принудительная остановка работы агента |
-| `/shutdown` | Выключение сервера Apogee |
+| *(any text)* | Dispatch prompt directly to the AntiGravity agent |
+| `/status` | Connection telemetry, active target port, and model status |
+| `/screenshot` | Capture and receive a screenshot of the active IDE window |
+| `/latest` | Retrieve the latest response from the agent |
+| `/model` | Interactive menu for model & thinking effort selection |
+| `/autoaccept` | Toggle automatic button confirmation on/off |
+| `/app [ide\|agent\|ag2]` | Switch active target between 2.0, IDE, and CLI |
+| `/stop` | Abort current agent generation |
+| `/shutdown` | Gracefully shut down Apogee server |
 
 ---
 
-## 🛡️ Архитектура безопасности
+## 🛡️ Security Architecture
 
-1. **Белые списки:** Доступ строго ограничен через `TELEGRAM_ALLOWED_USERS`, `WHATSAPP_ALLOWED_NUMBERS` и `DISCORD_ALLOWED_CHANNELS`.
-2. **Изоляция каналов:** Разрыв связи в WhatsApp или Telegram не прерывает работу остальных адаптеров.
-3. **Безопасность сессий:** Сессионные токены и ключи WhatsApp хранятся локально в `sessions/` и защищены `.gitignore`.
+1. **Whitelisting:** Access is strictly controlled via `TELEGRAM_ALLOWED_USERS`, `WHATSAPP_ALLOWED_NUMBERS`, and `DISCORD_ALLOWED_CHANNELS`.
+2. **Channel Isolation:** Network hiccups on WhatsApp or Telegram do not disrupt the other active channels.
+3. **Session Privacy:** WhatsApp auth credentials and secrets remain local in `sessions/` and are guarded by `.gitignore`.
 
 ---
 
 <div align="center">
 
 **Apogee Mission Control** — Designed & Developed by **ByKpubaq | Adil**  
-*Open Source bajo MIT License*
+*Open Source under MIT License*
 
 </div>

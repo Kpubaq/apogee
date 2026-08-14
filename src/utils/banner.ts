@@ -5,11 +5,11 @@
 import chalk from 'chalk';
 
 export function getApogeeBanner(): string {
-  const line1 = chalk.bold.cyan("    ___    ____  ____  ____________ ____ ");
-  const line2 = chalk.bold.cyan("   /   |  / __ \\/ __ \\/ ____/ ____// __ \\");
-  const line3 = chalk.bold.magenta("  / /| | / /_/ / / / / / __/ __/  / /_/ /");
-  const line4 = chalk.bold.magenta(" / ___ |/ ____/ /_/ / /_/ / /___ / ____/ ");
-  const line5 = chalk.bold.blue("/_/  |_/_/    \\____/\\____/_____//_/      ");
+  const line1 = chalk.bold.cyan("    ___    ____  ____  ______ ______ ______");
+  const line2 = chalk.bold.cyan("   /   |  / __ \\/ __ \\/ ____// ____// ____/");
+  const line3 = chalk.bold.magenta("  / /| | / /_/ / / / / / __ / __/  / __/   ");
+  const line4 = chalk.bold.magenta(" / ___ |/ ____/ /_/ / /_/ // /___ / /___   ");
+  const line5 = chalk.bold.blue("/_/  |_/_/    \\____/\\____//_____//_____/   ");
   const author = chalk.hex('#FFA500').bold("ByKpubaq | Adil");
 
   return `
